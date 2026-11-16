@@ -19,15 +19,15 @@
   .hero-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 24px;
     align-items: center;
-    padding-block: 28px 44px;
+    padding-block: 20px 32px;
   }
   @media (min-width: 860px) {
     .hero-grid {
       grid-template-columns: 1.1fr 0.9fr;
-      padding-block: 54px 64px;
-      gap: 48px;
+      padding-block: 48px 56px;
+      gap: 44px;
     }
   }
 
@@ -38,7 +38,7 @@
     line-height: 1.15;
     letter-spacing: -0.015em;
     color: var(--ink);
-    margin-bottom: 18px;
+    margin-bottom: 14px;
     text-wrap: balance;
   }
   .hero-h1 i {
@@ -47,17 +47,17 @@
     font-weight: 600;
   }
   .hero-lead {
-    font-size: 1.05rem;
-    line-height: 1.6;
+    font-size: 1.02rem;
+    line-height: 1.55;
     color: var(--muted);
-    margin-bottom: 28px;
+    margin-bottom: 22px;
     max-width: 520px;
   }
   .hero-actions {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    margin-bottom: 28px;
+    margin-bottom: 22px;
   }
   @media (min-width: 500px) {
     .hero-actions {
@@ -70,15 +70,15 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    font-size: 0.88rem;
+    font-size: 0.85rem;
     color: var(--muted);
-    padding-top: 18px;
+    padding-top: 16px;
     border-top: 1px solid var(--line);
   }
   @media (min-width: 500px) {
     .hero-trust {
       flex-direction: row;
-      gap: 20px;
+      gap: 18px;
     }
   }
   .hero-trust b { color: var(--ink); }
@@ -99,35 +99,81 @@
   }
   .hero-caption-pill {
     position: absolute;
-    bottom: 12px;
-    left: 12px;
-    right: 12px;
-    background: rgba(255, 255, 255, 0.94);
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(8px);
     border-radius: 12px;
-    padding: 10px 14px;
+    padding: 9px 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
   }
   .hero-caption-pill b {
     display: block;
-    font-size: 0.86rem;
+    font-size: 0.84rem;
     color: var(--ink);
   }
   .hero-caption-pill span {
-    font-size: 0.74rem;
+    font-size: 0.72rem;
     color: var(--muted);
   }
 
-  /* Services Grid */
-  .services-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 18px;
-    margin-top: 24px;
+  /* Food-first mobile vs desktop media toggling */
+  .hero-mobile-media {
+    display: block;
+    margin-bottom: 18px;
   }
+  .hero-desktop-media {
+    display: none;
+  }
+  @media (min-width: 860px) {
+    .hero-mobile-media {
+      display: none;
+    }
+    .hero-desktop-media {
+      display: block;
+    }
+  }
+
+  /* Fast Category Bar */
+  .cat-bar {
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 10px 0;
+  }
+  .cat-scroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .cat-scroll::-webkit-scrollbar { display: none; }
+  .cat-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 14px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: none;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .cat-chip:hover, .cat-chip:active {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+
   @media (min-width: 620px) {
     .services-grid { grid-template-columns: repeat(2, 1fr); }
   }
@@ -283,6 +329,19 @@
       <div>
         <div class="eyebrow">Online kitchen · Umule Road, Aba</div>
         <h1 class="hero-h1">Food that looks good and tastes <i>even better.</i></h1>
+
+        <!-- Mobile-only Food Visual: instantly visible above the fold -->
+        <div class="hero-media-card hero-mobile-media">
+          <img src="images/hero.jpg" alt="Esca Meals Nigerian food banquet feast spread">
+          <div class="hero-caption-pill">
+            <div>
+              <b>Cooked fresh to order</b>
+              <span>Soups by litre, peppered snail, wraps, party trays</span>
+            </div>
+            <span class="badge good">Umule Road, Aba</span>
+          </div>
+        </div>
+
         <p class="hero-lead">
           Home cooked food bowls, Peppered snail, rich soups and stews by the litre, chicken wraps, meal plans and preps and party trays. Cooked fresh to order on Umule Road, Aba. Choose your date, pay securely online, and get delivery across Aba or pick up at our kitchen.
         </p>
@@ -296,13 +355,32 @@
           <div class="trust-item">● <b>Delivery across Aba</b></div>
         </div>
       </div>
-      <div>
+      <div class="hero-desktop-media">
         <div class="hero-media-card">
           <img src="images/hero.jpg" alt="Esca Meals Nigerian food banquet feast spread">
+          <div class="hero-caption-pill">
+            <div>
+              <b>Cooked fresh to order</b>
+              <span>Soups by litre, peppered snail, wraps, party trays</span>
+            </div>
+            <span class="badge good">Umule Road, Aba</span>
+          </div>
         </div>
       </div>
     </div>
   </section>
+
+  <!-- Quick Category Navigation (No emojis) -->
+  <nav class="cat-bar" aria-label="Quick food categories">
+    <div class="wrap cat-scroll">
+      <a class="cat-chip" href="menu.html#cat-food-bowls-by-the-litre">Soups by the Litre</a>
+      <a class="cat-chip" href="menu.html#cat-peppered-snail-protein">Peppered Snail &amp; Protein</a>
+      <a class="cat-chip" href="menu.html#cat-chicken-turkey-beef-wraps">Wraps &amp; Combos</a>
+      <a class="cat-chip" href="menu.html#cat-platters-special-requests">Party Food Trays</a>
+      <a class="cat-chip" href="menu.html#cat-salads-healthy-sides">Salads &amp; Fresh Juices</a>
+      <a class="cat-chip" href="catering.html">Event &amp; Office Catering</a>
+    </div>
+  </nav>
 
   <!-- Our Services Section -->
   <section class="section" id="services" style="background:var(--surface); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
