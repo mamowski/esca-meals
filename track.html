@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Track Order | Esca Meals</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="assets/img/logo.svg">
+<link rel="stylesheet" href="assets/esca.css">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/site.js"></script>
+<style>
+  .track-search-panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .order-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body data-page="track">
+<main class="wrap" style="max-width:720px; padding-top:32px; padding-bottom:36px;">
+  <div class="eyebrow">Order status lookup</div>
+  <h1 style="font-size:clamp(1.9rem,5.5vw,2.8rem); margin-bottom:8px;">Where is my food?</h1>
+  <p class="muted" style="margin-bottom:20px;">
+    Enter your order code (such as ESC-7K3P9Q) or the WhatsApp phone number you provided during checkout.
+  </p>
+
+  <form class="track-search-panel" id="form">
+    <div class="grid-2">
+      <div class="field">
+        <label for="t-code">Order confirmation code</label>
+        <input id="t-code" placeholder="e.g. ESC-7K3P9Q" autocapitalize="characters">
+      </div>
+      <div class="field">
+        <label for="t-phone">or WhatsApp phone number</label>
+        <input id="t-phone" type="tel" placeholder="0813 794 5084">
+      </div>
+    </div>
+    <button class="btn btn-primary" type="submit" style="margin-top:14px">Check status →</button>
+  </form>
+
+  <div id="out" class="stack"></div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s), esc = ESCA.esc, money = ESCA.money;
+
+  const STATUS_LABELS = {
+    awaiting_payment: 'Awaiting payment',
+    confirmed: 'Payment confirmed · In kitchen queue',
+    preparing: 'Cooking now',
+    ready: 'Ready for pickup',
+    out_for_delivery: 'Out for delivery',
+    completed: 'Delivered',
+    cancelled: 'Order cancelled'
+  };
+
+  const STEPS = {
+    delivery: [
+      ['confirmed', 'Confirmed'],
+      ['preparing', 'Cooking'],
+      ['out_for_delivery', 'On the way'],
+      ['completed', 'Delivered']
+    ],
+    pickup: [
+      ['confirmed', 'Confirmed'],
+      ['preparing', 'Cooking'],
+      ['ready', 'Ready for pickup'],
+      ['completed', 'Collected']
+    ]
+  };
+
+  async function lookup(e) {
+    if (e) e.preventDefault();
+    const code = $('#t-code').value.trim();
+    const phone = $('#t-phone').value.trim();
+
+    if (!code && !phone) {
+      $('#out').innerHTML = '<div class="notice err">Please enter either an order code or a phone number.</div>';
+      return;
+    }
+
+    $('#out').innerHTML = '<p class="muted">Checking kitchen orders...</p>';
+
+    const r = await ESCA.call('order_status', { code, phone });
+
+    if (!r.ok) {
+      $('#out').innerHTML = `<div class="notice err">${esc(r.error || 'No orders found matching that code or phone number.')}</div>`;
+      return;
+    }
+
+    if (!r.orders || !r.orders.length) {
+      $('#out').innerHTML = '<div class="notice info">No orders found for this code or number. Please verify and try again.</div>';
+      return;
+    }
+
+    $('#out').innerHTML = r.orders.map(o => {
+      const st = STEPS[o.fulfilment] || STEPS.pickup;
+      const idx = st.findIndex(s => s[0] === o.status);
+      const done = o.status === 'completed' ? st.length - 1 : idx;
+      const cls = o.status === 'cancelled' ? 'bad' : o.status === 'awaiting_payment' ? 'warn' : 'ok';
+      const fulLabel = o.fulfilment === 'delivery' ? 'Doorstep Delivery' : 'Kitchen Pickup';
+
+      return `
+        <div class="ticket order-card">
+          <div class="row" style="align-items:center;">
+            <span class="code" style="font-size:1.05rem;">${esc(o.code)}</span>
+            <span class="spacer"></span>
+            <span class="badge ${cls}">${STATUS_LABELS[o.status] || esc(o.status)}</span>
+          </div>
+
+          <p class="small muted" style="margin:10px 0 14px">
+            Cooking date: <b>${esc(o.date_label)}</b>, window: <b>${esc(o.time_slot.replace('-', ' to '))}</b> · ${fulLabel}
+          </p>
+
+          ${(o.items || []).map(i => `
+            <div class="line">
+              <span>${i.quantity} × ${esc(i.name)}${i.option ? ` <span class="muted">(${esc(i.option)})</span>` : ''}</span>
+            </div>
+          `).join('')}
+
+          <div class="total" style="margin-top:10px">
+            <span>Total paid</span>
+            <span class="num">${money(o.total)}</span>
+          </div>
+
+          ${o.status === 'cancelled' || o.status === 'awaiting_payment' ? '' : `
+            <div class="steps" style="margin-top:18px">
+              ${st.map((s, i) => `
+                <div class="${i <= done ? 'done' : ''}">
+                  <i></i>${s[1]}
+                </div>
+              `).join('')}
+            </div>
+          `}
+
+          ${o.status === 'awaiting_payment' && o.checkout_url ? `
+            <div style="margin-top:16px">
+              <a class="btn btn-primary btn-block" href="${esc(o.checkout_url)}">Complete payment online →</a>
+            </div>
+          ` : ''}
+
+          ${o.status === 'ready' && o.fulfilment === 'pickup' ? `
+            <div class="notice ok small" style="margin-top:14px">
+              Your order is ready. Come to <b>${esc(ESCA.B.ADDRESS)}</b> and show code <b>${esc(o.code)}</b> to collect.
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  $('#form').onsubmit = lookup;
+
+  const q = new URLSearchParams(location.search).get('code');
+  if (q) {
+    $('#t-code').value = q;
+    lookup();
+  }
+});
+</script>
+</body>
+</html>

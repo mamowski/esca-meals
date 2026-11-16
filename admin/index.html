@@ -1,0 +1,1969 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>Kitchen Pass | Esca Meals</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg">
+<link rel="stylesheet" href="../assets/esca.css">
+<script src="../config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="../assets/data.js"></script>
+<style>
+  :root, html, body {
+    color-scheme: light !important;
+    --side-w: 248px;
+    --side-w-collapsed: 64px;
+    --side-bg: #160e0a;
+    --side-surface: #22150f;
+    --side-line: rgba(255, 255, 255, 0.08);
+    --side-text: #e6ded8;
+    --side-muted: #9c8a80;
+    --side-gold: #e5b98a;
+    --side-gold-soft: rgba(229, 185, 138, 0.14);
+    --canvas-bg: #faf7f4;
+    --canvas-border: #ebdcd0;
+    --ink: #24180f !important;
+    --muted: #6e625a !important;
+    --bg: #faf7f4 !important;
+    --surface: #ffffff !important;
+    --sunk: #f2ece4 !important;
+    --line: #ebdcd0 !important;
+    --line-subtle: #f0e6dc !important;
+    --cocoa-soft: #f4eee7 !important;
+    --btn-primary-bg: #24140e !important;
+    --btn-primary-text: #ffffff !important;
+    --btn-primary-border: #24140e !important;
+    --btn-ghost-bg: transparent !important;
+    --btn-ghost-text: #6e625a !important;
+    --btn-ghost-border: #ebdcd0 !important;
+  }
+
+  .btn-ghost {
+    background: transparent !important;
+    color: #6e625a !important;
+    border: 1px solid var(--canvas-border) !important;
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background: #f4eee7 !important;
+    color: #24140e !important;
+    border-color: #d8c4b2 !important;
+  }
+
+  body {
+    background: var(--canvas-bg) !important;
+    margin: 0;
+    padding: 0;
+    font-family: var(--sans);
+    color: #24180f !important;
+    min-height: 100vh;
+  }
+
+  /* Form controls color lock */
+  input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+    background: #ffffff !important;
+    color: #24180f !important;
+    border: 1px solid var(--canvas-border) !important;
+  }
+
+  /* Chip pills in admin */
+  .chip {
+    background: #f4eee7 !important;
+    color: #24180f !important;
+    border: 1px solid var(--canvas-border) !important;
+  }
+  .chip.on, .chip[aria-pressed="true"] {
+    background: #24140e !important;
+    color: #ffffff !important;
+    border-color: #24140e !important;
+  }
+
+  /* Enforce clean modern sans-serif across 100% of the admin dashboard */
+  *, *::before, *::after {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  }
+
+  /* Standard modern numbers: clean upright lining figures, tabular spacing, zero slash/serif */
+  body, input, select, textarea, button, h1, h2, h3, h4, b, strong, .num, .ticker-num, .side-brand-title, .price, [class*="stat"], [class*="num"], table, td, th {
+    font-variant-numeric: tabular-nums lining-nums !important;
+    font-feature-settings: "tnum" 1, "lnum" 1, "zero" 0 !important;
+  }
+
+  /* Global input resets to prevent massive checkboxes */
+  input[type="checkbox"], input[type="radio"] {
+    width: 16px !important;
+    height: 16px !important;
+    min-height: 16px !important;
+    max-width: 16px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    cursor: pointer;
+    accent-color: #24140e;
+  }
+
+  /* Overall App Layout */
+  .admin-frame {
+    display: flex;
+    min-height: 100vh;
+    background: var(--canvas-bg);
+  }
+
+  /* Retractable Sidebar */
+  #sidebar {
+    width: var(--side-w);
+    background: var(--side-bg);
+    color: var(--side-text);
+    border-right: 1px solid var(--side-line);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    z-index: 60;
+    transition: width 0.2s cubic-bezier(0.2, 0, 0, 1);
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+
+  #sidebar.collapsed {
+    width: var(--side-w-collapsed);
+  }
+
+  /* Sidebar Header */
+  .side-header {
+    padding: 16px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border-bottom: 1px solid var(--side-line);
+    min-height: 64px;
+    box-sizing: border-box;
+    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .side-brand-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  #sidebar.collapsed .side-header {
+    padding: 14px 6px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: auto;
+  }
+
+  #sidebar.collapsed .side-brand-wrap {
+    justify-content: center;
+    flex: 0;
+  }
+
+  #sidebar.collapsed .side-brand-text {
+    display: none;
+  }
+
+  .side-brand-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--side-surface);
+    border: 1px solid var(--side-line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .side-brand-icon img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .side-brand-text {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  #sidebar.collapsed .side-brand-text {
+    display: none;
+  }
+
+  .side-brand-title {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.01em;
+  }
+
+  .side-brand-sub {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--side-muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* n8n-style Sidebar Layout Toggle Button */
+  .sidebar-layout-btn {
+    background: transparent;
+    border: 1px solid var(--side-line);
+    color: var(--side-muted);
+    border-radius: 6px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+  }
+
+  .sidebar-layout-btn:hover {
+    background: var(--side-surface);
+    color: var(--side-gold);
+    border-color: var(--side-gold);
+  }
+
+  /* Navigation List */
+  .side-nav {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .side-nav-item {
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--side-text);
+    font: 600 0.88rem var(--sans);
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    transition: background 0.15s, color 0.15s;
+    box-sizing: border-box;
+    position: relative;
+    white-space: nowrap;
+  }
+
+  .side-nav-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+  }
+
+  .side-nav-item.active {
+    background: var(--side-gold-soft);
+    color: var(--side-gold);
+    font-weight: 700;
+  }
+
+  .side-nav-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: inherit;
+  }
+
+  .side-nav-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #sidebar.collapsed .side-nav-label {
+    display: none;
+  }
+
+  .side-nav-badge {
+    background: #d44d32;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+    line-height: 1;
+  }
+
+  #sidebar.collapsed .side-nav-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    padding: 2px 5px;
+    font-size: 0.65rem;
+  }
+
+  #sidebar.collapsed .side-nav-item {
+    justify-content: center;
+    padding: 10px 0;
+  }
+
+  /* Sidebar Footer */
+  .side-footer {
+    padding: 12px;
+    border-top: 1px solid var(--side-line);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--side-surface);
+  }
+
+  .side-user-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .side-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--side-gold-soft);
+    color: var(--side-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.78rem;
+    flex-shrink: 0;
+  }
+
+  .side-user-meta {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  #sidebar.collapsed .side-user-meta {
+    display: none;
+  }
+
+  .side-user-name {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .side-user-role {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--side-muted);
+  }
+
+  .side-footer-actions {
+    display: flex;
+    gap: 6px;
+  }
+
+  #sidebar.collapsed .side-footer-actions {
+    flex-direction: column;
+  }
+
+  .side-action-btn {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--side-line);
+    color: var(--side-text);
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 0.74rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+
+  .side-action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+
+  #sidebar.collapsed .side-action-btn span {
+    display: none;
+  }
+
+  /* Main Stage Workspace */
+  #main-stage {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  /* The Horizon Bar */
+  .horizon-bar {
+    background: #fff;
+    border-bottom: 1px solid var(--canvas-border);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  }
+
+  .horizon-lead {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .topbar-layout-btn {
+    background: transparent;
+    border: 1px solid var(--canvas-border);
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--ink);
+    transition: all 0.15s ease;
+  }
+
+  .topbar-layout-btn:hover {
+    background: #faf7f4;
+    border-color: var(--ink);
+  }
+
+  .horizon-greeting h1 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  .horizon-date {
+    font-size: 0.74rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  /* Grounded Operational Ticker Tile Cluster (Warm, purposeful, NOT stark) */
+  .horizon-ticker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+  }
+
+  .ticker-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2px;
+    background: #faf6f2;
+    border: 1px solid var(--canvas-border);
+    border-radius: 8px;
+    padding: 6px 14px;
+    min-width: 96px;
+    transition: background 0.15s ease;
+  }
+
+  .ticker-pill:hover {
+    background: #f4ece4;
+  }
+
+  .ticker-title {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #8c786d;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .ticker-num {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #24140e;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  /* Mobile Metric Strip (For Sonny's Phone) */
+  .mobile-metric-strip {
+    display: none;
+  }
+
+  /* Content Canvas */
+  .workspace-canvas {
+    padding: 20px;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Physical Docket Orders (Kitchen Pass) */
+  .docket-rail {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 14px;
+  }
+
+  .order-docket {
+    background: #fff;
+    border: 1px solid var(--canvas-border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    position: relative;
+    border-top: 3px solid #24140e !important;
+  }
+
+  .docket-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--canvas-border);
+  }
+
+  .docket-slot {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .docket-code {
+    font-family: monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .docket-customer {
+    font-size: 0.86rem;
+    line-height: 1.4;
+  }
+
+  .docket-items-list {
+    background: #faf7f4;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .docket-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-top: 4px;
+    flex-wrap: wrap;
+  }
+
+  /* Menu Directory Table */
+  .menu-atelier-table-wrap {
+    background: #fff;
+    border: 1px solid var(--canvas-border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  }
+
+  .menu-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  .menu-table th {
+    background: #faf7f4;
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--canvas-border);
+  }
+
+  .menu-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--canvas-border);
+    vertical-align: middle;
+  }
+
+  .menu-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .dish-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .dish-thumb-mini {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f0e6de;
+    flex-shrink: 0;
+    border: 1px solid var(--canvas-border);
+  }
+
+  .dish-thumb-mini img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .dish-name-cell b {
+    display: block;
+    font-size: 0.94rem;
+    color: var(--ink);
+  }
+
+  .dish-name-cell span {
+    display: block;
+    font-size: 0.76rem;
+    color: var(--muted);
+  }
+
+  .day-badge-row {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .day-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #f0e6de;
+    color: var(--ink);
+  }
+
+  .day-tag.off {
+    opacity: 0.35;
+    background: #f5f2ee;
+  }
+
+  /* Sleek iOS-style Switch Toggle */
+  .switch-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+  }
+
+  .switch-toggle input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+  }
+
+  .switch-track {
+    width: 36px;
+    height: 20px;
+    background: #dcd1c6;
+    border-radius: 999px;
+    position: relative;
+    transition: background 0.2s ease;
+    flex-shrink: 0;
+    border: 1px solid var(--canvas-border);
+  }
+
+  .switch-track::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 14px;
+    height: 14px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .switch-toggle input:checked + .switch-track {
+    background: #24140e;
+    border-color: #24140e;
+  }
+
+  .switch-toggle input:checked + .switch-track::after {
+    transform: translateX(16px);
+  }
+
+  /* Dedicated Modal Dialog */
+  #dish-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(22, 14, 10, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  #dish-modal-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  #dish-modal {
+    background: #fff;
+    width: 100%;
+    max-width: 660px;
+    max-height: 90vh;
+    border-radius: 16px;
+    border: 1px solid var(--canvas-border);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateY(12px) scale(0.98);
+    transition: transform 0.2s ease;
+  }
+
+  #dish-modal-backdrop.open #dish-modal {
+    transform: translateY(0) scale(1);
+  }
+
+  .modal-head {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--canvas-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    background: #faf7f4;
+  }
+
+  .modal-title-wrap h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .modal-title-wrap p {
+    margin: 2px 0 0;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .modal-close-btn {
+    background: transparent;
+    border: 1px solid var(--canvas-border);
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.15s;
+  }
+
+  .modal-close-btn:hover {
+    background: #fff;
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .modal-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--canvas-border);
+  }
+
+  .modal-section:last-of-type {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .modal-section-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+
+  .weekday-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .day-toggle-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #faf7f4;
+    border: 1px solid var(--canvas-border);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s;
+  }
+
+  .day-toggle-pill.active {
+    background: #24140e;
+    color: #fff;
+    border-color: #24140e;
+  }
+
+  .options-builder-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .option-row-edit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #faf7f4;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--canvas-border);
+  }
+
+  .option-row-edit input {
+    margin: 0;
+    padding: 8px 10px;
+    border: 1px solid var(--canvas-border);
+    border-radius: 6px;
+    background: #fff;
+    font-size: 0.88rem;
+  }
+
+  .option-name-input { flex: 2; }
+  .option-price-input { flex: 1; }
+
+  .option-del-btn {
+    background: transparent;
+    border: none;
+    color: #d44d32;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-foot {
+    padding: 14px 20px;
+    border-top: 1px solid var(--canvas-border);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    background: #faf7f4;
+  }
+
+  /* Pantry & Raw Food Market List Styles */
+  .pantry-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .pantry-card {
+    background: #fff;
+    border: 1px solid var(--canvas-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    transition: all 0.15s ease;
+  }
+
+  .pantry-card.bought {
+    opacity: 0.6;
+    background: #faf8f5;
+  }
+
+  .pantry-card.bought .pantry-item-name {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+
+  .pantry-lead-col {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 2;
+    min-width: 0;
+  }
+
+  .pantry-check-box {
+    width: 20px !important;
+    height: 20px !important;
+    min-height: 20px !important;
+    max-width: 20px !important;
+    cursor: pointer;
+    accent-color: #24140e;
+    flex-shrink: 0;
+  }
+
+  .pantry-item-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .pantry-item-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pantry-item-meta {
+    font-size: 0.76rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .pantry-qty-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .pantry-qty-value {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .pantry-cost-value {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .pantry-status-badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .pantry-status-badge.to_buy {
+    background: #fde8e4;
+    color: #c8361c;
+    border: 1px solid rgba(200, 54, 28, 0.2);
+  }
+
+  .pantry-status-badge.running_low {
+    background: #fbf0df;
+    color: #9a5b00;
+    border: 1px solid rgba(154, 91, 0, 0.2);
+  }
+
+  .pantry-status-badge.in_stock {
+    background: #e5f4ea;
+    color: #1f9d55;
+    border: 1px solid rgba(31, 157, 85, 0.2);
+  }
+
+  .pantry-actions-col {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  #pantry-modal-backdrop,
+  #new-order-modal-backdrop,
+  #new-catering-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(22, 14, 10, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  #pantry-modal-backdrop.open,
+  #new-order-modal-backdrop.open,
+  #new-catering-modal-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  #pantry-modal,
+  #new-order-modal,
+  #new-catering-modal {
+    background: #fff;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    border-radius: 16px;
+    border: 1px solid var(--canvas-border);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateY(12px) scale(0.98);
+    transition: transform 0.2s ease;
+  }
+
+  #new-order-modal {
+    max-width: 680px;
+  }
+
+  #new-catering-modal {
+    max-width: 620px;
+  }
+
+  #pantry-modal-backdrop.open #pantry-modal,
+  #new-order-modal-backdrop.open #new-order-modal,
+  #new-catering-modal-backdrop.open #new-catering-modal {
+    transform: translateY(0) scale(1);
+  }
+
+  .no-item-line {
+    background: #faf7f4;
+    border: 1px solid var(--canvas-border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  @media (max-width: 600px) {
+    .no-item-line {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .no-item-line .no-opt-wrap {
+      min-width: 100%;
+    }
+  }
+
+  /* Catering Card Styling */
+  .catering-card {
+    background: #fff;
+    border: 1px solid var(--canvas-border);
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+  }
+
+  .catering-card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .catering-client-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .catering-event-meta {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  .catering-status-select {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    width: auto;
+    border-radius: 6px;
+    border: 1px solid var(--canvas-border);
+    background: #faf7f4;
+  }
+
+  .catering-details-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #faf7f4;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--canvas-border);
+  }
+
+  .catering-detail-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.88rem;
+  }
+
+  .catering-summary-box {
+    background: #fbf7f0;
+    border-left: 3px solid #d48817;
+    padding: 10px 14px;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .catering-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-top: 4px;
+  }
+
+  .catering-quote-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  .catering-quote-wrap input {
+    width: 130px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--canvas-border);
+    font-size: 0.9rem;
+  }
+
+  /* Settings Grid */
+  .settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+
+  .settings-card {
+    background: #fff;
+    border: 1px solid var(--canvas-border);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .settings-card h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+
+  .zone-row-edit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #faf7f4;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--canvas-border);
+  }
+
+  /* Mobile Backdrop */
+  #sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 55;
+  }
+
+  /* Mobile Optimization (For Sonny's Phone < 900px) */
+  @media (max-width: 900px) {
+    #sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      transform: translateX(-100%);
+      transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    #sidebar.mobile-open {
+      transform: translateX(0);
+    }
+
+    #sidebar-backdrop.active {
+      display: block;
+    }
+
+    .horizon-bar {
+      padding: 10px 14px;
+    }
+
+    .horizon-ticker {
+      display: none;
+    }
+
+    /* Mobile Metric Strip */
+    .mobile-metric-strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 12px 14px 0;
+    }
+
+    .mobile-metric-card {
+      background: #fff;
+      border: 1px solid var(--canvas-border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+
+    .mobile-metric-card .title {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--muted);
+      display: block;
+    }
+
+    .mobile-metric-card .value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--ink);
+      display: block;
+      margin-top: 2px;
+    }
+
+    .workspace-canvas {
+      padding: 14px;
+    }
+
+    .overview-grid-cols {
+      grid-template-columns: 1fr !important;
+      gap: 14px !important;
+    }
+
+    .settings-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .catering-quote-wrap {
+      width: 100%;
+      margin-left: 0;
+    }
+
+    .catering-quote-wrap input {
+      flex: 1;
+    }
+
+    .catering-card-actions .btn-wa {
+      width: 100%;
+      justify-content: center;
+    }
+
+    /* Transform Menu Table into Mobile Dish Cards */
+    .menu-table, .menu-table tbody, .menu-table tr, .menu-table td {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .menu-table thead {
+      display: none;
+    }
+
+    .menu-table tr {
+      margin-bottom: 12px;
+      border: 1px solid var(--canvas-border);
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+    }
+
+    .menu-table td {
+      padding: 6px 0;
+      border-bottom: none;
+    }
+
+    .menu-table td[data-col="actions"] {
+      padding-top: 10px;
+      border-top: 1px solid var(--canvas-border);
+      margin-top: 8px;
+    }
+
+    .menu-table td[data-col="actions"] button {
+      width: 100%;
+      justify-content: center;
+      padding: 10px;
+      font-size: 0.9rem;
+    }
+
+    /* Modal Mobile Sheet */
+    #dish-modal {
+      max-height: 94vh;
+      border-radius: 14px 14px 0 0;
+      margin-top: auto;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="admin-frame">
+  <!-- Backdrop for Mobile Drawer -->
+  <div id="sidebar-backdrop"></div>
+
+  <!-- Retractable Command Rail -->
+  <aside id="sidebar" aria-label="Kitchen Navigation">
+    <div class="side-header">
+      <div class="side-brand-icon">
+        <img src="../assets/img/logo.svg" alt="Esca Logo" width="20" height="20">
+      </div>
+      <div class="side-brand-text">
+        <span class="side-brand-title">Esca Kitchen</span>
+        <span class="side-brand-sub">Umule Rd, Aba</span>
+      </div>
+    </div>
+
+    <nav class="side-nav" id="side-nav-links">
+      <!-- Injected by admin.js -->
+    </nav>
+
+    <div class="side-footer">
+      <div class="side-user-row">
+        <div class="side-avatar" id="side-user-avatar">S</div>
+        <div class="side-user-meta">
+          <span class="side-user-name" id="side-user-name">Staff</span>
+          <span class="side-user-role" id="side-user-role">Kitchen Team</span>
+        </div>
+      </div>
+      <div class="side-footer-actions">
+        <a class="side-action-btn" href="../index.html" target="_blank" rel="noopener" title="Visit Public Website">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          <span>Website</span>
+        </a>
+        <button class="side-action-btn" id="side-signout-btn" type="button" title="Sign out of staff account">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Sign out</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Stage Workspace -->
+  <main id="main-stage">
+    <!-- Clean, Non-Busy Horizon Bar -->
+    <header class="horizon-bar">
+      <div class="horizon-lead">
+        <!-- n8n style sidebar split layout icon in topbar -->
+        <button class="topbar-layout-btn" id="topbar-sidebar-toggle" type="button" aria-label="Toggle sidebar" title="Toggle sidebar">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+          </svg>
+        </button>
+        <div class="horizon-greeting">
+          <h1 id="horizon-heading">Kitchen orders</h1>
+          <div class="horizon-date" id="horizon-date">Loading...</div>
+        </div>
+      </div>
+
+      <!-- Live Operational Horizon Stream on Desktop -->
+      <div class="horizon-ticker" id="horizon-stream">
+        <div class="ticker-pill">
+          <span class="ticker-title">Orders today</span>
+          <b class="ticker-num" id="stat-orders-today">0</b>
+        </div>
+        <div class="ticker-pill">
+          <span class="ticker-title">Revenue today</span>
+          <b class="ticker-num" id="stat-revenue-today">₦0</b>
+        </div>
+        <div class="ticker-pill">
+          <span class="ticker-title">Deliveries</span>
+          <b class="ticker-num" id="stat-deliveries-today">0</b>
+        </div>
+        <div class="ticker-pill">
+          <span class="ticker-title">Pickups</span>
+          <b class="ticker-num" id="stat-pickups-today">0</b>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Operational Metric Strip (For Sonny's Phone) -->
+    <div class="mobile-metric-strip" id="mobile-metrics">
+      <div class="mobile-metric-card">
+        <span class="title">Orders today</span>
+        <b class="value" id="m-stat-orders">0</b>
+      </div>
+      <div class="mobile-metric-card">
+        <span class="title">Revenue today</span>
+        <b class="value" id="m-stat-revenue">₦0</b>
+      </div>
+      <div class="mobile-metric-card">
+        <span class="title">Deliveries</span>
+        <b class="value" id="m-stat-deliveries">0</b>
+      </div>
+      <div class="mobile-metric-card">
+        <span class="title">Pickups</span>
+        <b class="value" id="m-stat-pickups">0</b>
+      </div>
+    </div>
+
+    <!-- Dynamic Content Canvas -->
+    <div class="workspace-canvas" id="app">
+      <p class="muted" style="padding:40px 0; text-align:center;">Loading kitchen workspace...</p>
+    </div>
+  </main>
+</div>
+
+<!-- Dedicated Meal Edit / Add Modal (Mini-Screen) -->
+<div id="dish-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-dish-title">
+  <div id="dish-modal">
+    <div class="modal-head">
+      <div class="modal-title-wrap">
+        <h2 id="modal-dish-title">Edit Meal</h2>
+        <p id="modal-dish-sub">Configure dish details, sizes, available days, and portion limits.</p>
+      </div>
+      <button class="modal-close-btn" id="modal-close-trigger" type="button" aria-label="Close dialog">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <form class="modal-body" id="dish-edit-form">
+      <input type="hidden" id="m-id">
+
+      <!-- Section 1: Core Info -->
+      <div class="modal-section">
+        <span class="modal-section-title">Dish Details</span>
+        <div class="grid-2">
+          <div class="field" style="margin:0;">
+            <label for="m-name">Dish name</label>
+            <input id="m-name" required placeholder="e.g. Banga Soup Bowl">
+          </div>
+          <div class="field" style="margin:0;">
+            <label for="m-category-select">Category</label>
+            <select id="m-category-select" required style="width:100%; padding:10px 12px; font-size:0.92rem; border-radius:8px;">
+              <option value="" disabled selected>-- Select a category --</option>
+              <option value="Food bowls (by the litre)">Food bowls (by the litre)</option>
+              <option value="Peppered snail & protein">Peppered snail & protein</option>
+              <option value="Platters & special requests">Platters & special requests</option>
+              <option value="Wraps & healthy treats">Wraps & healthy treats</option>
+              <option value="__custom__">+ Add new category...</option>
+            </select>
+            <input id="m-category-custom" placeholder="Type new category name..." style="display:none; margin-top:8px; padding:10px 12px; font-size:0.92rem; border-radius:8px;" autocomplete="off">
+          </div>
+        </div>
+        <div class="field" style="margin:0;">
+          <label for="m-description">Appetizing description</label>
+          <textarea id="m-description" rows="2" placeholder="Describe the flavors, ingredients and pairing for customers..."></textarea>
+        </div>
+        <div class="grid-2">
+          <div class="field" style="margin:0;">
+            <label for="m-base-price">Base price ₦ (leave blank if price depends on size below)</label>
+            <input id="m-base-price" inputmode="numeric" placeholder="e.g. 25000">
+          </div>
+          <div class="field" style="margin:0;">
+            <label for="m-unit-label">Unit label</label>
+            <input id="m-unit-label" placeholder="e.g. 2 litres, per bowl, per wrap">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Days Available (Day-of-Week Checkbox Pills) -->
+      <div class="modal-section">
+        <div class="row" style="align-items:center; justify-content:space-between;">
+          <span class="modal-section-title">Days Available</span>
+          <button class="btn btn-ghost btn-sm" id="btn-every-day-toggle" type="button" style="padding:4px 10px; font-size:0.76rem;">Every day</button>
+        </div>
+        <div class="weekday-pills" id="weekday-pills-wrap">
+          <label class="day-toggle-pill active" data-day="Mon"><input type="checkbox" value="Mon" checked hidden><span>Mon</span></label>
+          <label class="day-toggle-pill active" data-day="Tue"><input type="checkbox" value="Tue" checked hidden><span>Tue</span></label>
+          <label class="day-toggle-pill active" data-day="Wed"><input type="checkbox" value="Wed" checked hidden><span>Wed</span></label>
+          <label class="day-toggle-pill active" data-day="Thu"><input type="checkbox" value="Thu" checked hidden><span>Thu</span></label>
+          <label class="day-toggle-pill active" data-day="Fri"><input type="checkbox" value="Fri" checked hidden><span>Fri</span></label>
+          <label class="day-toggle-pill active" data-day="Sat"><input type="checkbox" value="Sat" checked hidden><span>Sat</span></label>
+          <label class="day-toggle-pill active" data-day="Sun"><input type="checkbox" value="Sun" checked hidden><span>Sun</span></label>
+        </div>
+      </div>
+
+      <!-- Section 3: Sizes, Combos & Variations Builder -->
+      <div class="modal-section">
+        <div class="row" style="align-items:center; justify-content:space-between;">
+          <span class="modal-section-title">Sizes and Combos</span>
+          <button class="btn btn-ghost btn-sm" id="btn-add-option-row" type="button" style="padding:4px 10px; font-size:0.76rem;">+ Add size / combo</button>
+        </div>
+        <p class="muted small" style="margin:0;">Add different sizes or combo variations (e.g. 2 Litres, 3 Litres, 4 Litres, or Wrap + Chapman). Customers choose one before checkout.</p>
+        <div class="options-builder-list" id="modal-options-list">
+          <!-- Dynamic Option Rows Injected Here -->
+        </div>
+      </div>
+
+      <!-- Section 4: Photo Upload & URL -->
+      <div class="modal-section">
+        <span class="modal-section-title">Dish Photography</span>
+        <div class="row" style="gap:14px; align-items:center;">
+          <div class="dish-thumb-mini" style="width:64px; height:64px; border-radius:10px;" id="modal-photo-preview-wrap">
+            <img id="modal-photo-preview" src="" alt="Dish preview" style="display:none;">
+            <div id="modal-photo-placeholder" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:0.75rem; text-align:center; padding:4px;">No photo</div>
+          </div>
+          <div style="flex:1;">
+            <input id="m-image-url" placeholder="Photo URL (https://...)" style="margin-bottom:8px;">
+            <label class="btn btn-ghost btn-sm" style="display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              <span>Upload photo file</span>
+              <input type="file" id="m-photo-file" accept="image/*" hidden>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: Menu Status -->
+      <div class="modal-section">
+        <span class="modal-section-title">Menu Status</span>
+        <div class="row" style="gap:20px; align-items:center;">
+          <label class="switch-toggle">
+            <input type="checkbox" id="m-is-active" checked>
+            <span class="switch-track"></span>
+            <span style="font-weight:600; font-size:0.86rem;">Live on public menu</span>
+          </label>
+          <label class="switch-toggle">
+            <input type="checkbox" id="m-is-featured">
+            <span class="switch-track"></span>
+            <span style="font-weight:600; font-size:0.86rem;">Customer favourite badge</span>
+          </label>
+        </div>
+      </div>
+    </form>
+
+    <div class="modal-foot">
+      <button class="btn btn-ghost" id="modal-cancel-btn" type="button">Cancel</button>
+      <button class="btn btn-primary" id="modal-save-btn" type="button">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Dedicated Raw Food Pantry & Market Item Modal -->
+<div id="pantry-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pantry-modal-title">
+  <div id="pantry-modal">
+    <div class="modal-head">
+      <div class="modal-title-wrap">
+        <h2 id="pantry-modal-title">Add raw pantry item</h2>
+        <p>Keep track of raw cooking ingredients and market shopping needs.</p>
+      </div>
+      <button class="modal-close-btn" id="btn-close-pantry-modal" type="button" aria-label="Close modal">&times;</button>
+    </div>
+    <form id="pantry-modal-form" class="modal-body">
+      <input type="hidden" id="pantry-item-id">
+      
+      <div class="field" style="margin:0;">
+        <label class="small muted" for="pantry-input-name">Ingredient name (raw food)</label>
+        <input id="pantry-input-name" placeholder="e.g. Fresh big snails, Goat meat, Crayfish" required>
+      </div>
+
+      <div class="grid-2">
+        <div class="field" style="margin:0;">
+          <label class="small muted" for="pantry-input-category">Category</label>
+          <select id="pantry-input-category" required>
+            <option value="Proteins & Meat">Proteins & Meat</option>
+            <option value="Produce & Peppers">Produce & Peppers</option>
+            <option value="Oils, Spices & Staples">Oils, Spices & Staples</option>
+            <option value="Packaging & Supplies">Packaging & Supplies</option>
+          </select>
+        </div>
+        <div class="field" style="margin:0;">
+          <label class="small muted" for="pantry-input-status">Current stock status</label>
+          <select id="pantry-input-status" required>
+            <option value="to_buy">Need to buy (Market list)</option>
+            <option value="running_low">Running low</option>
+            <option value="in_stock">In stock / Sufficient</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field" style="margin:0;">
+          <label class="small muted" for="pantry-input-quantity">Quantity needed</label>
+          <input id="pantry-input-quantity" placeholder="e.g. 50 pieces, 5 kg, 2 paint buckets" required>
+        </div>
+        <div class="field" style="margin:0;">
+          <label class="small muted" for="pantry-input-cost">Estimated budget / cost (₦)</label>
+          <input id="pantry-input-cost" type="number" placeholder="e.g. 25000">
+        </div>
+      </div>
+
+      <div class="field" style="margin:0;">
+        <label class="small muted" for="pantry-input-vendor">Market / Vendor note</label>
+        <input id="pantry-input-vendor" placeholder="e.g. Ariaria Market (Mallam Musa), Cemetery Market">
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn btn-ghost" id="btn-cancel-pantry-modal" type="button">Cancel</button>
+        <button class="btn btn-primary" id="btn-save-pantry-modal" type="submit">Save ingredient</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Dedicated Phone/Message Order Modal (Staff Direct Entry) -->
+<div id="new-order-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="new-order-modal-title">
+  <div id="new-order-modal">
+    <div class="modal-head">
+      <div class="modal-title-wrap">
+        <h2 id="new-order-modal-title">Enter Phone / WhatsApp Order</h2>
+        <p>Record a pre-order for a customer who phoned or messaged the kitchen.</p>
+      </div>
+      <button class="modal-close-btn" id="btn-close-new-order-modal" type="button" aria-label="Close modal">&times;</button>
+    </div>
+    
+    <!-- Form View -->
+    <form id="new-order-modal-form" class="modal-body" novalidate>
+      <div id="new-order-error-msg" style="display:none;"></div>
+
+      <!-- Customer Details -->
+      <div class="modal-section">
+        <span class="modal-section-title">Customer Contact</span>
+        <div class="grid-2">
+          <div class="field" style="margin:0;">
+            <label class="small muted" for="no-name">Customer Name *</label>
+            <input id="no-name" required placeholder="e.g. Chief Emeka Ibe">
+          </div>
+          <div class="field" style="margin:0;">
+            <label class="small muted" for="no-phone">WhatsApp Phone *</label>
+            <input id="no-phone" type="tel" required placeholder="0803 123 4567">
+          </div>
+        </div>
+        <div class="field" style="margin:0;">
+          <label class="small muted" for="no-email">Email (optional, for payment receipt)</label>
+          <input id="no-email" type="email" placeholder="customer@example.com">
+        </div>
+      </div>
+
+      <!-- Fulfilment -->
+      <div class="modal-section">
+        <span class="modal-section-title">Fulfillment Option</span>
+        <div class="row" style="gap:16px; margin-bottom:6px;">
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:600; font-size:0.9rem;">
+            <input type="radio" name="no-fulfilment" value="delivery" checked id="no-radio-delivery">
+            <span>Delivery</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:600; font-size:0.9rem;">
+            <input type="radio" name="no-fulfilment" value="pickup" id="no-radio-pickup">
+            <span>Kitchen Pickup (Umule Road)</span>
+          </label>
+        </div>
+
+        <!-- Delivery Fields (shown when delivery selected) -->
+        <div id="no-delivery-fields" style="display:flex; flex-direction:column; gap:10px; margin-top:6px;">
+          <div class="field" style="margin:0;">
+            <label class="small muted" for="no-delivery-zone">Delivery Area *</label>
+            <select id="no-delivery-zone"></select>
+          </div>
+          <div class="grid-2">
+            <div class="field" style="margin:0;">
+              <label class="small muted" for="no-address">Street Address in Aba *</label>
+              <input id="no-address" placeholder="e.g. 14 Hospital Road, Aba Central">
+            </div>
+            <div class="field" style="margin:0;">
+              <label class="small muted" for="no-landmark">Landmark / Note</label>
+              <input id="no-landmark" placeholder="e.g. Beside General Hospital entrance">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cooking Date & Time Slot -->
+      <div class="modal-section">
+        <span class="modal-section-title">Date & Delivery Window</span>
+        <div class="grid-2">
+          <div class="field" style="margin:0;">
+            <label class="small muted" for="no-date">Fulfilment Date *</label>
+            <input type="date" id="no-date" required>
+          </div>
+          <div class="field" style="margin:0;">
+            <label class="small muted" for="no-time-slot">Time Window *</label>
+            <select id="no-time-slot" required></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Menu Items Lines -->
+      <div class="modal-section">
+        <div class="row" style="align-items:center; justify-content:space-between;">
+          <span class="modal-section-title">Order Items</span>
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-no-add-item" style="font-size:0.8rem; padding:4px 10px;">+ Add dish</button>
+        </div>
+        <div id="no-items-container" style="display:flex; flex-direction:column; gap:10px;"></div>
+        
+        <!-- Estimated Total Preview -->
+        <div style="background:#faf7f4; border:1px solid var(--canvas-border); border-radius:8px; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; margin-top:6px;">
+          <span class="small muted">Estimated Total (calculated by system upon submit):</span>
+          <b id="no-est-total" style="font-size:1.05rem; color:var(--ink);">₦0</b>
+        </div>
+      </div>
+
+      <!-- Kitchen Notes -->
+      <div class="modal-section">
+        <span class="modal-section-title">Kitchen & Packaging Notes (optional)</span>
+        <textarea id="no-notes" rows="2" placeholder="e.g. Less pepper, pack hot, extra pepper sauce..."></textarea>
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn btn-ghost" id="btn-cancel-new-order-modal" type="button">Cancel</button>
+        <button class="btn btn-primary" id="btn-submit-new-order" type="submit">Place order</button>
+      </div>
+    </form>
+
+    <!-- Success View (Shown upon ok: true) -->
+    <div id="new-order-success-view" class="modal-body" style="display:none; text-align:center; padding:24px 20px;">
+      <div style="width:54px; height:54px; border-radius:50%; background:#e8f7ee; color:#1f9d55; display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px;">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+      <h2 style="margin:0 0 4px; font-size:1.35rem; color:var(--ink);" id="no-success-code">Order Code</h2>
+      <p class="small muted" style="margin:0 0 16px;" id="no-success-summary">Summary</p>
+
+      <div style="background:#faf7f4; border:1px solid var(--canvas-border); border-radius:10px; padding:14px; text-align:left; margin-bottom:18px;">
+        <div class="row" style="justify-content:space-between; margin-bottom:6px;">
+          <span class="small muted">Total Amount:</span>
+          <b id="no-success-total" style="font-size:1.15rem; color:var(--ink);">₦0</b>
+        </div>
+        <div class="row" style="justify-content:space-between; margin-bottom:6px;">
+          <span class="small muted">Customer:</span>
+          <span id="no-success-customer" class="small" style="font-weight:600;"></span>
+        </div>
+        <div class="row" style="justify-content:space-between; margin-bottom:6px;">
+          <span class="small muted">Payment status:</span>
+          <span id="no-success-paystatus" class="badge warn">Awaiting payment</span>
+        </div>
+        <div style="margin-top:10px; padding-top:8px; border-top:1px dashed var(--canvas-border);">
+          <span class="tiny muted" style="display:block; margin-bottom:4px;">Payment link:</span>
+          <input id="no-success-link" readonly style="font-size:0.8rem; background:#fff; cursor:text;">
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div class="row" style="gap:8px;">
+          <button type="button" class="btn btn-ghost" id="btn-no-copy-link" style="flex:1;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span>Copy payment link</span>
+          </button>
+          <button type="button" class="btn btn-wa" id="btn-no-send-wa" style="flex:1;">
+            <span>Send link on WhatsApp</span>
+          </button>
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-no-mark-paid" style="width:100%; justify-content:center;">
+          Mark paid (transfer/cash)
+        </button>
+        <button type="button" class="btn btn-ghost btn-sm" id="btn-no-done" style="margin-top:4px;">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Dedicated Catering Enquiry Modal (Staff Direct Entry) -->
+<div id="new-catering-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="new-catering-modal-title">
+  <div id="new-catering-modal">
+    <div class="modal-head">
+      <div class="modal-title-wrap">
+        <h2 id="new-catering-modal-title">Record Catering Enquiry</h2>
+        <p>Log a catering or party event enquiry received via phone, WhatsApp, or walk-in.</p>
+      </div>
+      <button class="modal-close-btn" id="btn-close-new-catering-modal" type="button" aria-label="Close modal">&times;</button>
+    </div>
+
+    <form id="new-catering-modal-form" class="modal-body" novalidate>
+      <div id="new-catering-error-msg" style="display:none;"></div>
+
+      <div class="modal-section">
+        <span class="modal-section-title">Client Contact</span>
+        <div class="grid-2">
+          <div class="field" style="margin:0;">
+            <label class="small muted" for="nc-name">Full Name *</label>
+            <input id="nc-name" required placeholder="e.g. Chioma Okeke">
+          </div>
+          <div class="field" style="margin:0;">
+            <label class="small muted" for="nc-phone">WhatsApp Number *</label>
+            <input id="nc-phone" type="tel" required placeholder="0813 794 5084">
+          </div>
+        </div>
+        <div class="field" style="margin:0;">
+          <label class="small muted" for="nc-email">Email (optional)</label>
+          <input id="nc-email" type="email" placeholder="name@example.com">
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <span class="modal-section-title">Event Information</span>
+        <div class="grid-2">
+          <div class="field" style="margin:0;">
+            <label class="small muted" for="nc-type">Event Type</label>
+            <select id="nc-type">
+              <option>Birthday party</option>
+              <option>Wedding or introduction</option>
+              <option>Office lunch or corporate meeting</option>
+              <option>Church event or fellowship</option>
+              <option>Funeral or memorial reception</option>
+              <option>House warming</option>
+              <option>Other celebration</option>
+            </select>
+          </div>
+          <div class="field" style="margin:0;">
+            <label class="small muted" for="nc-date">Event Date</label>
+            <input id="nc-date" type="date">
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field" style="margin:0;">
+            <label class="small muted" for="nc-guests">Expected Guests</label>
+            <input id="nc-guests" inputmode="numeric" placeholder="e.g. 50">
+          </div>
+          <div class="field" style="margin:0;">
+            <label class="small muted" for="nc-budget">Target Budget</label>
+            <input id="nc-budget" placeholder="e.g. ₦250,000">
+          </div>
+        </div>
+        <div class="field" style="margin:0;">
+          <label class="small muted" for="nc-location">Event Venue / Location in Aba</label>
+          <input id="nc-location" placeholder="e.g. GRA, Umule, Ogbor Hill, Faulks Road">
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <span class="modal-section-title">Catering Service & Dishes</span>
+        <div class="field" style="margin:0;">
+          <label class="small muted" for="nc-service">What they want</label>
+          <input id="nc-service" placeholder="e.g. Party rice trays, 50 pcs peppered snail, chicken wraps">
+        </div>
+        <div class="field" style="margin:0;">
+          <label class="small muted" for="nc-details">Specific Details & Notes</label>
+          <textarea id="nc-details" rows="3" placeholder="Tell us about serving staff needs, delivery timing, or allergy notes..."></textarea>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn btn-ghost" id="btn-cancel-new-catering-modal" type="button">Cancel</button>
+        <button class="btn btn-primary" id="btn-submit-new-catering" type="submit">Save enquiry</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../assets/admin.js"></script>
+</body>
+</html>

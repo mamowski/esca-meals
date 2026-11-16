@@ -1,0 +1,1007 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Esca Meals  -  Direction 2: Clean Premium (Mobile-First)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="assets/img/logo.svg">
+<style>
+  :root {
+    --cocoa: #7a5240;
+    --cocoa-dark: #4a3024;
+    --cocoa-soft: #f4ece6;
+    --cocoa-cream: #fbf7f4;
+    --ink: #24180f;
+    --muted: #6e625a;
+    --bg-warm: #f9f6f2;
+    --surface: #ffffff;
+    --line: #e8dfd7;
+    --line-subtle: #f0e8e2;
+    --chili: #c8361c;
+    --chili-hover: #a92a13;
+    --wa-green: #1f9d55;
+    --wa-hover: #167e43;
+    --leaf: #2c7442;
+    --leaf-soft: #e5f2e8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', -apple-system, sans-serif;
+    background: #140d09;
+    color: var(--ink);
+    min-height: 100vh;
+    padding-bottom: 90px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Control bar */
+  .control-bar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(20, 13, 9, 0.96);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    color: #fff;
+  }
+  .brand-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-badge {
+    background: var(--chili);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+  .brand-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #f8f5f0;
+  }
+  .view-mode-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .view-mode-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #eee;
+    padding: 6px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+  .view-mode-btn.active {
+    background: var(--cocoa);
+    color: #fff;
+    border-color: var(--cocoa);
+  }
+
+  /* Stage container */
+  .stage {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 16px;
+    transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .stage.mobile-view {
+    max-width: 375px;
+    padding: 0;
+  }
+
+  /* Direction wrapper */
+  .direction-panel {
+    background: var(--bg-warm);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .stage.mobile-view .direction-panel {
+    border-radius: 0;
+    border: none;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+  }
+
+  /* Banner */
+  .announcement-bar {
+    background: #3a251b;
+    color: #f7ebe3;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 9px 14px;
+    text-align: center;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .announcement-bar b { color: #fff; }
+
+  /* Navigation */
+  .site-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    background: #ffffff;
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .nav-brand img { width: 36px; height: 36px; }
+  .nav-brand-text b {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    display: block;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+  }
+  .nav-brand-text small {
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-cart-btn {
+    background: var(--ink);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+  }
+  .nav-cart-count {
+    background: var(--chili);
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 1px 6px;
+    border-radius: 999px;
+  }
+  .nav-wa-btn {
+    background: var(--wa-green);
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 1.1rem;
+  }
+
+  /* Shared Buttons */
+  .btn-esca {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 999px;
+    padding: 14px 24px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.15s, box-shadow 0.15s;
+    border: none;
+    min-height: 48px;
+    text-align: center;
+  }
+  .btn-esca:active { transform: scale(0.98); }
+  .btn-esca.primary { background: var(--chili); color: #fff; }
+  .btn-esca.primary:hover { background: var(--chili-hover); }
+  .btn-esca.dark { background: var(--ink); color: #fff; }
+  .btn-esca.dark:hover { background: #382417; }
+  .btn-esca.outline { background: transparent; border: 1.5px solid var(--ink); color: var(--ink); }
+  .btn-esca.outline:hover { background: var(--cocoa-soft); }
+  .btn-esca.wa { background: var(--wa-green); color: #fff; }
+  .btn-esca.wa:hover { background: var(--wa-hover); }
+  .btn-block { width: 100%; }
+
+  /* Hero Section (Clean Premium Mobile-First) */
+  .hero-sec {
+    padding: 32px 20px 40px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 28px;
+    align-items: center;
+  }
+  @media (min-width: 860px) {
+    .hero-sec {
+      grid-template-columns: 1.1fr 0.9fr;
+      padding: 64px 44px 72px;
+      gap: 48px;
+    }
+  }
+
+  .hero-subhead {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cocoa);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-subhead::before {
+    content: '';
+    width: 20px;
+    height: 1.5px;
+    background: var(--cocoa);
+  }
+
+  /* Responsive Headline Fix: perfectly balanced on 360px */
+  .hero-h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(2rem, 8vw, 3.4rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin-bottom: 16px;
+    text-wrap: balance;
+    word-break: normal;
+    hyphens: none;
+  }
+  .hero-h1 i {
+    font-style: italic;
+    color: var(--cocoa);
+    font-weight: 600;
+  }
+
+  .hero-lead {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #5a4e46;
+    margin-bottom: 24px;
+    max-width: 480px;
+  }
+
+  .hero-ctas {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  @media (min-width: 520px) {
+    .hero-ctas {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+  }
+
+  .hero-trust-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #6c5f56;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+  @media (min-width: 520px) {
+    .hero-trust-row {
+      flex-direction: row;
+      gap: 18px;
+    }
+  }
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Hero Media Container */
+  .hero-media-wrap {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 16px 36px rgba(45, 28, 18, 0.14);
+    aspect-ratio: 4 / 3;
+    background: #24180f;
+  }
+  .hero-media-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero-media-pill {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+  }
+  .hero-media-pill b {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--ink);
+  }
+  .hero-media-pill span {
+    font-size: 0.74rem;
+    color: var(--muted);
+  }
+
+  /* Date Picker Strip (Crucial for Sonny's daily portions) */
+  .date-strip {
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .date-strip-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .date-strip select {
+    background: var(--bg-warm);
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  /* Sticky Category Pills (Clean Premium Style) */
+  .cats-nav-container {
+    background: var(--bg-warm);
+    position: sticky;
+    top: 50px;
+    z-index: 50;
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 4px 12px rgba(36,24,15,0.04);
+  }
+  .cats-nav {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+  }
+  .cats-nav::-webkit-scrollbar { display: none; }
+  .c-pill {
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.84rem;
+    background: #ffffff;
+    border: 1.5px solid var(--line);
+    color: var(--ink);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .c-pill.active {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+
+  /* Menu Cards Section */
+  .menu-sec {
+    padding: 30px 16px 60px;
+  }
+  .menu-sec-head {
+    margin-bottom: 22px;
+  }
+  .menu-sec-head span {
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--cocoa);
+  }
+  .menu-sec-head h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.6rem, 6vw, 2.3rem);
+    font-weight: 700;
+    color: var(--ink);
+    margin-top: 4px;
+    letter-spacing: -0.01em;
+  }
+
+  .dishes-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+  @media (min-width: 680px) {
+    .dishes-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+  }
+  @media (min-width: 1020px) {
+    .dishes-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+  }
+
+  /* Dish Card (Clean Premium Editorial) */
+  .dish-card {
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 14px rgba(36,24,15,0.04);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .dish-card-media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: #24180f;
+    overflow: hidden;
+  }
+  .dish-card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .dish-badge-left {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(4px);
+    color: var(--ink);
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .dish-badge-right {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--chili);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 999px;
+    text-transform: uppercase;
+  }
+  .dish-card-body {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  .dish-card-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+  .dish-card-desc {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 16px;
+    flex: 1;
+  }
+
+  /* Interactive Option Selector Chips (Touch-friendly 44px) */
+  .opt-selector-wrap {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .opt-chip {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    background: var(--cocoa-soft);
+    color: var(--cocoa-dark);
+    border: 1px solid var(--line);
+    cursor: pointer;
+    transition: all 0.15s;
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .opt-chip.active {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+
+  .dish-card-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--line-subtle);
+    padding-top: 14px;
+    gap: 12px;
+  }
+  .price-col small {
+    font-size: 0.72rem;
+    color: var(--muted);
+    display: block;
+    font-weight: 600;
+  }
+  .price-col .val {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--ink);
+  }
+
+  /* Floating Cart Summary Bar */
+  .cart-bottom-bar {
+    position: fixed;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    left: 16px;
+    right: 16px;
+    max-width: 480px;
+    margin: 0 auto;
+    background: var(--ink);
+    color: #fff;
+    border-radius: 999px;
+    padding: 10px 16px 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.4);
+    z-index: 100;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .cart-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cart-items-tag {
+    background: var(--chili);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .cart-total-text {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #ffd8a8;
+  }
+
+  /* Floating WhatsApp Quick Button */
+  .wa-float-btn {
+    position: fixed;
+    right: calc(16px + env(safe-area-inset-right, 0px));
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    z-index: 90;
+    background: #1f9d55;
+    color: #ffffff;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(31, 157, 85, 0.45);
+    text-decoration: none;
+    font-size: 1.5rem;
+  }
+
+  /* Footer */
+  .site-footer {
+    background: #1a120c;
+    color: #e6ded6;
+    padding: 40px 20px 30px;
+    border-top: 2px solid var(--cocoa);
+    font-size: 0.88rem;
+  }
+  .site-footer h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .site-footer p {
+    color: #b5a79d;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+  .site-footer a {
+    color: #ffd8a8;
+    text-decoration: none;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Top View Mode Controller -->
+  <div class="control-bar">
+    <div class="brand-group">
+      <span class="brand-badge">Esca Meals</span>
+      <span class="brand-title">Direction 2: Clean Premium (Mobile Test)</span>
+    </div>
+    <div class="view-mode-toggle">
+      <button class="view-mode-btn" id="btn-desktop" onclick="setMode('desktop')">Laptop View</button>
+      <button class="view-mode-btn active" id="btn-mobile" onclick="setMode('mobile')">Sonny's Phone (375px)</button>
+    </div>
+  </div>
+
+  <div class="stage mobile-view" id="main-stage">
+    <div class="direction-panel">
+
+      <!-- Schedule Announcement Bar -->
+      <div class="announcement-bar">
+         Umule Road, Aba · <b>Order by 8:00 PM for tomorrow</b>
+      </div>
+
+      <!-- Header Navigation -->
+      <header class="site-nav">
+        <a class="nav-brand" href="#">
+          <img src="assets/img/logo.svg" alt="Esca Meals logo">
+          <div class="nav-brand-text">
+            <b>Esca Meals</b>
+            <small>Umule Road · Aba</small>
+          </div>
+        </a>
+        <div class="nav-actions">
+          <a href="https://wa.me/2348137945084" class="nav-wa-btn" target="_blank" rel="noopener" aria-label="WhatsApp Sonny"></a>
+          <a href="menu.html#cart" class="nav-cart-btn">
+            Cart <span class="nav-cart-count">2</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- Date Selection Strip -->
+      <div class="date-strip">
+        <div class="date-strip-label">
+          <span> Cooking for:</span>
+          <select id="date-select" onchange="changeDate(this.value)">
+            <option value="2026-11-14">Tomorrow (Sat 14 Nov)</option>
+            <option value="2026-11-15">Sunday 15 Nov</option>
+            <option value="2026-11-16">Monday 16 Nov</option>
+          </select>
+        </div>
+        <span style="font-size:0.75rem; color:var(--leaf); font-weight:700;">● Orders open</span>
+      </div>
+
+      <!-- Hero Section (Clean Premium - Fixed for Mobile) -->
+      <section class="hero-sec">
+        <div>
+          <div class="hero-subhead">Online kitchen · Umule Road, Aba</div>
+          <h1 class="hero-h1">Food that looks good and tastes <i>even better.</i></h1>
+          <p class="hero-lead">
+            Esca Meals prepares gourmet Nigerian specialties, fresh soup & stew bowls by the litre, and lavish celebration platters - cooked strictly to order with zero shortcuts.
+          </p>
+          <div class="hero-ctas">
+            <a href="#menu-dishes" class="btn-esca primary btn-block">Order for your date →</a>
+            <a href="catering.html" class="btn-esca outline btn-block">Plan an event / quote</a>
+            <a href="https://wa.me/2348137945084" class="btn-esca wa btn-block" target="_blank" rel="noopener">WhatsApp Sonny</a>
+          </div>
+          <div class="hero-trust-row">
+            <div class="trust-item"> <b>Cooked fresh to order</b></div>
+            <div class="trust-item"> <b>Card or transfer via Bachs</b></div>
+            <div class="trust-item"> <b>Delivery across Aba</b></div>
+          </div>
+        </div>
+
+        <div class="hero-media-wrap">
+          <img src="images/hero.jpg" alt="Esca Meals authentic Nigerian banquet feast">
+          <div class="hero-media-pill">
+            <div>
+              <b>Pre-ordered & Cooked Fresh</b>
+              <span>Pick up on Umule Road or delivered across Aba</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sticky Category Filter Navigation -->
+      <nav class="cats-nav-container">
+        <div class="cats-nav">
+          <button class="c-pill active" onclick="filterDishes('all', this)"> All Offerings</button>
+          <button class="c-pill" onclick="filterDishes('snail', this)"> Peppered Snail</button>
+          <button class="c-pill" onclick="filterDishes('bowls', this)"> Stews & Soups (by Litre)</button>
+          <button class="c-pill" onclick="filterDishes('wraps', this)"> Wraps & Treats</button>
+          <button class="c-pill" onclick="filterDishes('platters', this)"> Platters & Special</button>
+        </div>
+      </nav>
+
+      <!-- Menu Section -->
+      <section class="menu-sec" id="menu-dishes">
+        <div class="menu-sec-head">
+          <span>Curated For You</span>
+          <h2>Signature Offerings</h2>
+        </div>
+
+        <div class="dishes-grid">
+
+          <!-- Dish 1: Peppered Snail -->
+          <article class="dish-card" data-cat="snail">
+            <div class="dish-card-media">
+              <img src="images/peppered-snail.jpg" alt="Peppered snail signature dish" loading="lazy">
+              <span class="dish-badge-left">Best Seller</span>
+              <span class="dish-badge-right">Cooked Fresh</span>
+            </div>
+            <div class="dish-card-body">
+              <h3 class="dish-card-title">Peppered Snail</h3>
+              <p class="dish-card-desc">Our hallmark preparation: prime African giant land snails slowly simmered in an aromatic scotch bonnet glaze with sautéed onions.</p>
+              
+              <!-- Touch-Friendly Size Chips -->
+              <div class="opt-selector-wrap">
+                <button type="button" class="opt-chip active" onclick="setOpt(this, '₦16,000')">25 pcs · ₦16k</button>
+                <button type="button" class="opt-chip" onclick="setOpt(this, '₦32,000')">50 pcs · ₦32k</button>
+                <button type="button" class="opt-chip" onclick="setOpt(this, '₦64,000')">100 pcs · ₦64k</button>
+              </div>
+
+              <div class="dish-card-foot">
+                <div class="price-col">
+                  <small>Selected price</small>
+                  <span class="val">₦16,000</span>
+                </div>
+                <a href="menu.html" class="btn-esca primary" style="min-height:42px; padding:8px 18px; font-size:0.86rem;">Add +</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Dish 2: Chicken Stew (3 Litres) -->
+          <article class="dish-card" data-cat="bowls">
+            <div class="dish-card-media">
+              <img src="images/chicken-stew.jpg" alt="Chicken stew family bowl" loading="lazy">
+              <span class="dish-badge-left">3 Litres</span>
+              <span class="dish-badge-right" style="background:#4a3024;">Freezer Ready</span>
+            </div>
+            <div class="dish-card-body">
+              <h3 class="dish-card-title">Chicken Stew Bowl</h3>
+              <p class="dish-card-desc">Rich tomato and red pepper stew loaded with succulent bone-in chicken cuts. Freezer friendly for easy weekly family dinners.</p>
+              
+              <div class="opt-selector-wrap">
+                <span class="opt-chip active">Family Pack (3 Litres)</span>
+              </div>
+
+              <div class="dish-card-foot">
+                <div class="price-col">
+                  <small>3 Litre Bowl</small>
+                  <span class="val">₦32,000</span>
+                </div>
+                <a href="menu.html" class="btn-esca primary" style="min-height:42px; padding:8px 18px; font-size:0.86rem;">Add +</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Dish 3: Goat Meat Pepper Soup -->
+          <article class="dish-card" data-cat="bowls">
+            <div class="dish-card-media">
+              <img src="images/goat-meat-pepper-soup.jpg" alt="Goat meat pepper soup" loading="lazy">
+              <span class="dish-badge-left">2 Litres</span>
+            </div>
+            <div class="dish-card-body">
+              <h3 class="dish-card-title">Goat Meat Pepper Soup</h3>
+              <p class="dish-card-desc">Aromatic, soothing broth steeped in traditional uziza herbs and hot indigenous spices, loaded with tender bone-in goat meat.</p>
+              
+              <div class="opt-selector-wrap">
+                <span class="opt-chip active">2 Litres Bowl · ₦23k</span>
+              </div>
+
+              <div class="dish-card-foot">
+                <div class="price-col">
+                  <small>2 Litre Bowl</small>
+                  <span class="val">₦23,000</span>
+                </div>
+                <a href="menu.html" class="btn-esca primary" style="min-height:42px; padding:8px 18px; font-size:0.86rem;">Add +</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Dish 4: Chicken Wrap Combo -->
+          <article class="dish-card" data-cat="wraps">
+            <div class="dish-card-media">
+              <img src="images/chicken-wrap.jpg" alt="Chicken wrap combo" loading="lazy">
+              <span class="dish-badge-left" style="color:var(--leaf);">Aba Fave</span>
+            </div>
+            <div class="dish-card-body">
+              <h3 class="dish-card-title">Chicken Wrap</h3>
+              <p class="dish-card-desc">"The best chicken wrap in the city of Aba." Grilled chicken, fresh vegetables and creamy secret sauce in a warm toasted wrap.</p>
+              
+              <div class="opt-selector-wrap">
+                <button type="button" class="opt-chip" onclick="setOpt(this, '₦7,000')">Wrap only · ₦7k</button>
+                <button type="button" class="opt-chip active" onclick="setOpt(this, '₦9,500')">Wrap + Chapman · ₦9.5k</button>
+              </div>
+
+              <div class="dish-card-foot">
+                <div class="price-col">
+                  <small>Combo price</small>
+                  <span class="val">₦9,500</span>
+                </div>
+                <a href="menu.html" class="btn-esca primary" style="min-height:42px; padding:8px 18px; font-size:0.86rem;">Add +</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Dish 5: Customised Platter -->
+          <article class="dish-card" data-cat="platters">
+            <div class="dish-card-media">
+              <img src="images/customised-platter.jpg" alt="Customised gift platter" loading="lazy">
+              <span class="dish-badge-left">Gift Hamper</span>
+            </div>
+            <div class="dish-card-body">
+              <h3 class="dish-card-title">Customised Gift Platter</h3>
+              <p class="dish-card-desc">8 glazed peppered turkey wings, 4 Ensure nutrition drinks, fresh clementines, apples and grapes tied with silk ribbon.</p>
+              
+              <div class="opt-selector-wrap">
+                <span class="opt-chip active">Luxury Gift Hamper Box</span>
+              </div>
+
+              <div class="dish-card-foot">
+                <div class="price-col">
+                  <small>Complete Hamper</small>
+                  <span class="val">₦89,000</span>
+                </div>
+                <a href="menu.html" class="btn-esca primary" style="min-height:42px; padding:8px 18px; font-size:0.86rem;">Order Hamper</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Dish 6: Seafood Boil (Quote on request) -->
+          <article class="dish-card" data-cat="platters">
+            <div class="dish-card-media">
+              <img src="images/seafood-boil.jpg" alt="Seafood boil feast platter" loading="lazy">
+              <span class="dish-badge-left">Special Order</span>
+            </div>
+            <div class="dish-card-body">
+              <h3 class="dish-card-title">Seafood Boil Feast</h3>
+              <p class="dish-card-desc">Giant tiger prawns, crabs, calamari, peppered snails, sweet corn, boiled eggs and potatoes in spicy garlic butter pepper sauce.</p>
+              
+              <div class="opt-selector-wrap">
+                <span class="opt-chip active">Advance Notice Required</span>
+              </div>
+
+              <div class="dish-card-foot">
+                <div class="price-col">
+                  <small>Pricing</small>
+                  <span class="val" style="font-size:1.05rem; color:var(--cocoa);">Price on request</span>
+                </div>
+                <a href="catering.html?item=Seafood+boil" class="btn-esca dark" style="min-height:42px; padding:8px 18px; font-size:0.86rem;">Get quote</a>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="site-footer">
+        <h3>Esca Meals</h3>
+        <p>Food that looks good and tastes even better. Online kitchen on Umule Road, Aba, Abia State.</p>
+        <p>WhatsApp / Call: <b style="color:#fff;">0813 794 5084</b><br>
+        TikTok & Instagram: <a href="https://www.tiktok.com/@esca_meals" target="_blank" rel="noopener">@esca_meals</a></p>
+        <p style="font-size:0.78rem; opacity:0.7; margin-top:20px;">
+          Payments processed securely by Bachs in Nigerian Naira (₦). Pre-order kitchen cooked fresh to order.
+        </p>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- Floating Mobile Order Summary Bar -->
+  <div class="cart-bottom-bar">
+    <div class="cart-left">
+      <span class="cart-items-tag">2 items</span>
+      <span class="cart-total-text">₦25,500</span>
+    </div>
+    <a href="menu.html#cart" class="btn-esca primary" style="min-height:38px; padding:6px 16px; font-size:0.84rem;">View Order →</a>
+  </div>
+
+  <!-- Floating WhatsApp Quick Button -->
+  <a href="https://wa.me/2348137945084?text=Hello%20Esca%20Meals" class="wa-float-btn" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"></a>
+
+<script>
+function setMode(mode) {
+  const stage = document.getElementById('main-stage');
+  const btnDesk = document.getElementById('btn-desktop');
+  const btnMob = document.getElementById('btn-mobile');
+  if (mode === 'mobile') {
+    stage.classList.add('mobile-view');
+    btnMob.classList.add('active');
+    btnDesk.classList.remove('active');
+  } else {
+    stage.classList.remove('mobile-view');
+    btnDesk.classList.add('active');
+    btnMob.classList.remove('active');
+  }
+}
+
+function filterDishes(cat, btn) {
+  document.querySelectorAll('.c-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  const cards = document.querySelectorAll('.dish-card');
+  cards.forEach(card => {
+    if (cat === 'all') {
+      card.style.display = 'flex';
+    } else {
+      const c = card.dataset.cat || '';
+      card.style.display = c === cat ? 'flex' : 'none';
+    }
+  });
+}
+
+function setOpt(btn, price) {
+  const parent = btn.closest('.dish-card');
+  parent.querySelectorAll('.opt-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  parent.querySelector('.val').textContent = price;
+}
+
+function changeDate(d) {
+  // Demo date change notice
+  console.log('Date switched to', d);
+}
+</script>
+</body>
+</html>

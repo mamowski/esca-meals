@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Payment | Esca Meals</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="assets/img/logo.svg">
+<link rel="stylesheet" href="assets/esca.css">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/site.js"></script>
+<style>
+  .sim-box {
+    border: 2px dashed var(--cocoa);
+    border-radius: var(--radius);
+    padding: 24px;
+    background: var(--surface);
+    display: grid;
+    gap: 16px;
+  }
+  .sim-methods {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (max-width: 480px) {
+    .sim-methods { grid-template-columns: 1fr; }
+  }
+  .payment-state-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    box-shadow: var(--shadow-sm);
+  }
+</style>
+</head>
+<body data-page="pay">
+<main class="wrap" style="max-width:640px; padding-top:36px; padding-bottom:36px;">
+  <div id="out" class="stack">
+    <p class="muted">Verifying your payment...</p>
+  </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s), esc = ESCA.esc, money = ESCA.money;
+  const q = new URLSearchParams(location.search);
+  const code = (q.get('code') || '').toUpperCase();
+  const out = $('#out');
+
+  if (!code) {
+    out.innerHTML = '<div class="notice err">No order code found in this link. <a href="track.html">Track an order</a> instead.</div>';
+    return;
+  }
+
+  // Simulated Bachs Checkout for DEMO Mode
+  if (q.get('demo_checkout') && ESCA.DEMO) {
+    ESCA.call('order_status', { code }).then(r => {
+      const o = r.ok && r.orders[0];
+      if (!o) {
+        out.innerHTML = `<div class="notice err">${esc(r.error || 'Order not found')}</div>`;
+        return;
+      }
+
+      out.innerHTML = `
+        <div class="sim-box">
+          <div class="row" style="align-items:center;">
+            <span class="badge warn">Demo mode: simulated payment</span>
+            <span class="spacer"></span>
+            <span class="tiny muted">No actual funds charged</span>
+          </div>
+
+          <div>
+            <div class="small muted">Esca Meals · Order ${esc(o.code)}</div>
+            <div style="font:700 2.2rem var(--display); color:var(--ink);" class="num">${money(o.total)}</div>
+          </div>
+
+          <p class="small muted" style="margin:0; line-height:1.5;">
+            On the live system, customers complete payment securely using debit card or instant bank transfer in naira.
+          </p>
+
+          <div class="sim-methods">
+            <button class="btn btn-primary" type="button" id="pay-card">Pay by debit card (test)</button>
+            <button class="btn btn-ghost" type="button" id="pay-bank">Pay by bank transfer (test)</button>
+          </div>
+
+          <button class="btn btn-ghost btn-sm" type="button" id="cancel" style="justify-self:start">Cancel and return</button>
+        </div>
+      `;
+
+      const done = () => {
+        ESCA.demoPay(code);
+        location.replace(`pay.html?code=${code}`);
+      };
+
+      $('#pay-card').onclick = done;
+      $('#pay-bank').onclick = done;
+      $('#cancel').onclick = () => location.replace(`pay.html?code=${code}&cancelled=1`);
+    });
+    return;
+  }
+
+  // Verification when returning from Bachs
+  let tries = 0;
+  let timer = null;
+
+  const items = o => (o.items || []).map(i => `
+    <div class="line">
+      <span>${i.quantity} × ${esc(i.name)}${i.option ? ` <span class="muted">(${esc(i.option)})</span>` : ''}</span>
+    </div>
+  `).join('');
+
+  async function check() {
+    const r = await ESCA.call('check_payment', { code });
+    if (!r.ok) {
+      out.innerHTML = `
+        <div class="notice err">${esc(r.error || 'Could not verify payment')}</div>
+        <a class="btn btn-ghost" href="track.html">Track an order</a>
+      `;
+      return;
+    }
+
+    const o = r.orders[0];
+    const fulLabel = o.fulfilment === 'delivery' ? 'Doorstep Delivery' : 'Kitchen Pickup';
+
+    // 1. Success: Fully Paid
+    if (o.payment_status === 'paid' && o.status !== 'cancelled') {
+      const pend = ESCA.store.get('esca_pending', null);
+      if (pend && pend.code === o.code) {
+        Site.Cart.clear();
+        ESCA.store.del('esca_pending');
+      }
+
+      out.innerHTML = `
+        <div class="payment-state-card stack">
+          <div style="display:flex; justify-content:center; color:var(--cocoa-dark);">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <h1 style="font-size:clamp(1.8rem,5.5vw,2.6rem); margin:0;">Payment confirmed!</h1>
+          <p class="muted" style="margin:0 0 16px;">
+            Thank you! Your order is in the kitchen queue. We will send progress updates to your WhatsApp as your meal is cooked fresh.
+          </p>
+
+          <div class="ticket">
+            <div class="row" style="align-items:center;">
+              <span class="code">Order ${esc(o.code)}</span>
+              <span class="spacer"></span>
+              <span class="badge ok">Paid</span>
+            </div>
+            <p class="small muted" style="margin:10px 0 12px">
+              Date: <b>${esc(o.date_label)}</b>, window: <b>${esc(o.time_slot.replace('-', ' to '))}</b> · ${fulLabel}
+            </p>
+            ${items(o)}
+            <div class="total" style="margin-top:10px">
+              <span>Amount paid</span>
+              <span class="num">${money(o.total)}</span>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:14px; gap:10px;">
+            <a class="btn btn-primary" href="track.html?code=${esc(o.code)}">Track order status →</a>
+            <a class="btn btn-ghost" href="menu.html">Back to menu</a>
+          </div>
+
+          <p class="small muted" style="margin-top:12px;">
+            Keep your order code <b>${esc(o.code)}</b> for reference. For any question, WhatsApp Sonny on <b>${esc(ESCA.B.PHONE)}</b>.
+          </p>
+        </div>
+      `;
+      return;
+    }
+
+    // 2. Underpaid
+    if (o.payment_status === 'underpaid') {
+      out.innerHTML = `
+        <div class="payment-state-card stack">
+          <h1 style="font-size:1.9rem; margin:0;">Partial payment received</h1>
+          <div class="notice warn">
+            Order <b>${esc(o.code)}</b>: The amount received was less than ${money(o.total)}. Sonny will reach out on WhatsApp to resolve this, or you can message us directly.
+          </div>
+          <a class="btn btn-wa" target="_blank" rel="noopener" href="${ESCA.waLink('Hello, about partial payment on order ' + o.code)}">
+            Message Sonny on WhatsApp
+          </a>
+        </div>
+      `;
+      return;
+    }
+
+    // 3. Cancelled
+    if (o.status === 'cancelled') {
+      out.innerHTML = `
+        <div class="payment-state-card stack">
+          <h1 style="font-size:1.9rem; margin:0;">Order not completed</h1>
+          <p class="muted">
+            Payment was not confirmed in time, so order ${esc(o.code)} was released. Your selected items are still in your cart if you wish to try again.
+          </p>
+          <div class="row" style="gap:10px;">
+            <a class="btn btn-primary" href="menu.html#cart">Review cart and reorder</a>
+            <a class="btn btn-wa" target="_blank" rel="noopener" href="${ESCA.waLink('Hello, I need help with order ' + o.code)}">
+              WhatsApp Sonny
+            </a>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    // 4. Cancelled param in URL
+    if (q.get('cancelled')) {
+      out.innerHTML = `
+        <div class="payment-state-card stack">
+          <h1 style="font-size:1.9rem; margin:0;">Payment was not finished</h1>
+          <p class="muted">
+            We are holding order <b>${esc(o.code)}</b> (${money(o.total)}) for a short window. You can return to payment or adjust your items.
+          </p>
+          <div class="row" style="gap:10px;">
+            ${o.checkout_url ? `<a class="btn btn-primary" href="${esc(o.checkout_url)}">Return to payment</a>` : ''}
+            <a class="btn btn-ghost" href="menu.html#cart">Adjust order</a>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    // 5. Polling for confirmation
+    tries++;
+    out.innerHTML = `
+      <div class="payment-state-card stack">
+        <h1 style="font-size:1.9rem; margin:0;">Confirming payment...</h1>
+        <p class="muted">
+          Order <b>${esc(o.code)}</b> · ${money(o.total)}. Card payments confirm within seconds. Bank transfers may take a couple of minutes to clear. This screen checks automatically.
+        </p>
+        <div class="notice info small">
+          ${tries < 20 ? 'Checking transaction status...' : 'Payment is taking longer than usual to reflect. If transfer left your bank, you will receive a WhatsApp confirmation once it lands. You may safely close this page.'}
+        </div>
+        <div class="row" style="gap:10px;">
+          ${o.checkout_url ? `<a class="btn btn-ghost" href="${esc(o.checkout_url)}">Return to payment page</a>` : ''}
+          <button class="btn btn-primary" type="button" id="again">Check now</button>
+        </div>
+      </div>
+    `;
+
+    $('#again').onclick = () => {
+      clearTimeout(timer);
+      check();
+    };
+
+    if (tries < 20) {
+      timer = setTimeout(check, 6000);
+    }
+  }
+
+  check();
+});
+</script>
+</body>
+</html>

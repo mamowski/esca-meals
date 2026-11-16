@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Esca Meals | Food that looks good and tastes even better</title>
+<meta name="description" content="Esca Meals, Aba: home cooked food bowls, peppered snail, rich soups and stews by the litre, chicken wraps, weekly meal plans and party trays. Cooked fresh to order on Umule Road.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="assets/img/logo.svg">
+<link rel="stylesheet" href="assets/esca.css">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/site.js"></script>
+<style>
+  /* Hero section styling */
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    align-items: center;
+    padding-block: 28px 44px;
+  }
+  @media (min-width: 860px) {
+    .hero-grid {
+      grid-template-columns: 1.1fr 0.9fr;
+      padding-block: 54px 64px;
+      gap: 48px;
+    }
+  }
+
+  .hero-h1 {
+    font-family: var(--display);
+    font-size: clamp(2rem, 7.5vw, 3.4rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin-bottom: 18px;
+    text-wrap: balance;
+  }
+  .hero-h1 i {
+    font-style: italic;
+    color: var(--cocoa);
+    font-weight: 600;
+  }
+  .hero-lead {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--muted);
+    margin-bottom: 28px;
+    max-width: 520px;
+  }
+  .hero-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  @media (min-width: 500px) {
+    .hero-actions {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+  }
+
+  .hero-trust {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.88rem;
+    color: var(--muted);
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+  }
+  @media (min-width: 500px) {
+    .hero-trust {
+      flex-direction: row;
+      gap: 20px;
+    }
+  }
+  .hero-trust b { color: var(--ink); }
+
+  .hero-media-card {
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    background: var(--cocoa-dark);
+    aspect-ratio: 4 / 3;
+    border: 1px solid var(--line);
+  }
+  .hero-media-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero-caption-pill {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+  }
+  .hero-caption-pill b {
+    display: block;
+    font-size: 0.86rem;
+    color: var(--ink);
+  }
+  .hero-caption-pill span {
+    font-size: 0.74rem;
+    color: var(--muted);
+  }
+
+  /* Services Grid */
+  .services-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    margin-top: 24px;
+  }
+  @media (min-width: 620px) {
+    .services-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 980px) {
+    .services-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  .service-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .service-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    border-color: var(--cocoa);
+  }
+  .service-card h3 {
+    font-family: var(--display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+    line-height: 1.25;
+  }
+  .service-card p {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 18px;
+    flex: 1;
+  }
+  .service-card .card-link {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--cocoa-dark);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.15s ease;
+  }
+  .service-card .card-link:hover,
+  .service-card .card-link:active,
+  .service-card .card-link:focus {
+    color: var(--amber-link);
+    text-decoration: underline;
+  }
+  .card-action-link {
+    font-weight: 700;
+    color: var(--cocoa-dark);
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+  .card-action-link:hover,
+  .card-action-link:active,
+  .card-action-link:focus {
+    color: var(--amber-link);
+    text-decoration: underline;
+  }
+
+  /* Steps Grid */
+  .steps-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 24px;
+    counter-reset: step-counter;
+  }
+  @media (min-width: 760px) {
+    .steps-row { grid-template-columns: repeat(3, 1fr); }
+  }
+  .step-box {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--cocoa);
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding: 22px;
+  }
+  .step-box::before {
+    counter-increment: step-counter;
+    content: "Step 0" counter(step-counter);
+    display: block;
+    font: 800 0.76rem var(--sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cocoa);
+    margin-bottom: 8px;
+  }
+  .step-box h3 {
+    font-family: var(--display);
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+  .step-box p {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* Fulfillment Paths */
+  .paths-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 24px;
+  }
+  @media (min-width: 760px) {
+    .paths-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  .path-box {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+  }
+  .path-box h3 {
+    font-family: var(--display);
+    font-size: 1.25rem;
+    margin-bottom: 8px;
+  }
+  .path-box p {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 14px;
+    flex: 1;
+  }
+
+  /* Contact / Location Split */
+  .contact-split {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  @media (min-width: 760px) {
+    .contact-split { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body data-page="home">
+<main>
+  <!-- Hero Section -->
+  <section class="section" style="padding-top:20px; padding-bottom:36px;">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">Online kitchen · Umule Road, Aba</div>
+        <h1 class="hero-h1">Food that looks good and tastes <i>even better.</i></h1>
+        <p class="hero-lead">
+          Home cooked food bowls, Peppered snail, rich soups and stews by the litre, chicken wraps, meal plans and preps and party trays. Cooked fresh to order on Umule Road, Aba. Choose your date, pay securely online, and get delivery across Aba or pick up at our kitchen.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="menu.html">Order now →</a>
+          <a class="btn btn-ghost" href="catering.html">Plan an event</a>
+        </div>
+        <div class="hero-trust">
+          <div class="trust-item">● <b>Cooked fresh to order</b></div>
+          <div class="trust-item">● <b>Card or bank transfer</b></div>
+          <div class="trust-item">● <b>Delivery across Aba</b></div>
+        </div>
+      </div>
+      <div>
+        <div class="hero-media-card">
+          <img src="images/hero.jpg" alt="Esca Meals Nigerian food banquet feast spread">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Our Services Section -->
+  <section class="section" id="services" style="background:var(--surface); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+    <div class="wrap">
+      <div class="row" style="align-items:flex-end; justify-content:space-between;">
+        <div>
+          <div class="eyebrow">Our Kitchen Services</div>
+          <h2 style="margin:0">What We Can Do for You</h2>
+        </div>
+        <a class="btn btn-ghost btn-sm" href="menu.html">Browse all items →</a>
+      </div>
+      <p class="muted small" style="margin-top:8px; max-width:44em;">
+        Everything is cooked fresh to order from our kitchen on Umule Road, Aba. Here are the core services we provide to homes, offices, and events.
+      </p>
+
+      <div class="services-grid">
+        <!-- Service 1: Food Bowls by the Litre -->
+        <div class="service-card">
+          <h3>Food Bowls by the Litre</h3>
+          <p>Fresh food bowls ordered in 1-litre, 2-litre, or family sizes: rich Nigerian soups (ogbono, vegetable, pepper soup), chicken stew, jollof rice, fried rice, village spaghetti, and beans, loaded with proteins and cooked fresh.</p>
+          <a class="card-link" href="menu.html#cat-food-bowls-by-the-litre">View food bowls →</a>
+        </div>
+
+        <!-- Service 2: Pre-Ordered Meals and Combos -->
+        <div class="service-card">
+          <h3>Pre-Ordered Meals and Combos</h3>
+          <p>Our famous peppered snail (25, 50, or 100 pieces), toasted chicken wraps with Chapman, and fresh protein packs cooked for your chosen date.</p>
+          <a class="card-link" href="menu.html#cat-peppered-snail-protein">Order food packs →</a>
+        </div>
+
+        <!-- Service 3: Party Food Trays -->
+        <div class="service-card">
+          <h3>Party Food Trays</h3>
+          <p>Generous party trays of seasoned jollof rice, fried rice, dodo, and peppered chicken, cooked to feed crowds at birthdays, office lunches, and celebrations.</p>
+          <a class="card-link" href="menu.html#cat-platters-special-requests">See party food trays →</a>
+        </div>
+
+        <!-- Service 4: Event and Office Catering -->
+        <div class="service-card">
+          <h3>Event and Office Catering</h3>
+          <p>Catering for birthdays, weddings, office meetings, and church events. Tell us your date and guest count, and Sonny will reply with a quote.</p>
+          <a class="card-link" href="catering.html">Get catering quote →</a>
+        </div>
+
+        <!-- Service 5: Custom Gift Platters and Hampers -->
+        <div class="service-card">
+          <h3>Custom Gift Platters and Hampers</h3>
+          <p>Curated gift platters with peppered turkey, fruits, Ensure shakes, and juices. One of our signature VIP gift items (from ₦89,000), popular for birthdays and anniversaries.</p>
+          <a class="card-link" href="menu.html#cat-platters-special-requests">View gift platters →</a>
+        </div>
+
+        <!-- Service 6: Seafood Boil and Special Orders -->
+        <div class="service-card">
+          <h3>Seafood Boil and Special Orders</h3>
+          <p>Fresh seafood boil platters prepared on special request: jumbo crabs, king prawns, snails, corn, calamari, and seasoned potatoes cooked in spicy butter sauce.</p>
+          <a class="card-link" href="catering.html?item=Seafood+boil">Order seafood boil →</a>
+        </div>
+
+        <!-- Service 7: Weekly Meal Plans and Meal Prep -->
+        <div class="service-card">
+          <h3>Weekly Meal Plans and Meal Prep</h3>
+          <p>Healthy, home cooked meals prepared for your week. Delivered in clean food bowls ready for your fridge or freezer so you save cooking stress.</p>
+          <a class="card-link" href="catering.html?item=Weekly+meal+plan">Request a meal plan quote →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Customer Favourites (Best Sellers) -->
+  <section class="section">
+    <div class="wrap">
+      <div class="row" style="align-items:flex-end; justify-content:space-between; margin-bottom:24px;">
+        <div>
+          <div class="eyebrow">Customer Favourites</div>
+          <h2 style="margin:0">What our customers are rushing</h2>
+        </div>
+        <a class="btn btn-ghost btn-sm" href="menu.html">Full menu (23 dishes) →</a>
+      </div>
+      <div class="dishes" id="featured-dishes">
+        <p class="muted">Loading dishes from the menu…</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How Ordering Works -->
+  <section class="section" style="background:var(--surface); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+    <div class="wrap">
+      <div class="eyebrow">Ordering Guide</div>
+      <h2>Order today, eat fresh on your day</h2>
+      <p class="muted small" style="max-width:38em;">
+        Everything is cooked fresh to order. Please place your order by 8:00 PM for next-day cooking and delivery.
+      </p>
+      <div class="steps-row">
+        <div class="step-box">
+          <h3>1. Choose food and a date</h3>
+          <p>Select sizes (25, 50, or 100 snail pieces, 2L or 3L soup bowls), then pick your date and convenient time window.</p>
+        </div>
+        <div class="step-box">
+          <h3>2. Pay securely online</h3>
+          <p>Pay securely by card or bank transfer. You receive confirmation on WhatsApp right away.</p>
+        </div>
+        <div class="step-box">
+          <h3>3. We cook and deliver</h3>
+          <p>We cook your food hot and fresh. Pick up at our kitchen on Umule Road or receive direct delivery across Aba.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fulfillment Paths -->
+  <section class="section">
+    <div class="wrap">
+      <div class="eyebrow">Delivery & Collection</div>
+      <h2>How would you like your food?</h2>
+      <div class="paths-grid">
+        <div class="path-box">
+          <h3>Pickup on Umule Road</h3>
+          <p>Free collection directly at our kitchen. Bring your order code when your collection window arrives.</p>
+          <span class="small" style="font-weight:700; color:var(--cocoa-dark);">Free · Umule Road, Aba</span>
+        </div>
+        <div class="path-box">
+          <h3>Delivery across Aba</h3>
+          <p>Doorstep delivery to Aba town (₦2,000) and outskirts like Osisioma, Ogbor Hill, and Eziama (₦3,500).</p>
+          <span class="small" style="font-weight:700; color:var(--cocoa);">From ₦2,000 by zone</span>
+        </div>
+        <div class="path-box">
+          <h3>Events and Custom Quotes</h3>
+          <p>Large food trays, seafood boils, and event catering. Sonny reviews guest counts and sends a WhatsApp quote.</p>
+          <a href="catering.html" class="small card-action-link">Request custom quote →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Our Story Section -->
+  <section class="section" style="background:var(--cocoa-soft); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+    <div class="wrap" style="max-width:760px; text-align:center;">
+      <div class="eyebrow" style="justify-content:center;">Our Story</div>
+      <h2 style="margin-bottom:14px;">Fresh cooking from the heart of Aba</h2>
+      <p class="lead" id="brand-story-text" style="color:var(--ink); font-size:1.05rem; line-height:1.6;">
+        Esca Meals started with a simple promise: food that looks good and tastes even better. Operating as an online pre-order kitchen on Umule Road, Aba, we cook every soup, stew, wrap, and snail pack fresh to order. Known across Aba on TikTok and Instagram (@esca_meals) for generous portions, rich flavours, and dependable service.
+      </p>
+    </div>
+  </section>
+
+  <!-- Find Us & Contact Section -->
+  <section class="section">
+    <div class="wrap contact-split">
+      <div class="panel">
+        <div class="eyebrow">Location</div>
+        <h2 style="margin-bottom:10px;">Umule Road, Aba</h2>
+        <p class="muted">
+          We operate as an online pre-order kitchen. Orders are placed through this site or directly on WhatsApp. Pickup is available at our Umule Road location.
+        </p>
+        <p style="margin-top:16px;">
+          WhatsApp or call: <b style="user-select:all" id="contact-phone">0813 794 5084</b>
+        </p>
+        <div class="row" style="margin-top:18px;">
+          <a class="btn btn-wa btn-sm" id="wa-contact-link" target="_blank" rel="noopener">Chat on WhatsApp</a>
+          <a class="btn btn-ghost btn-sm" href="https://www.google.com/maps/search/?api=1&query=Umule+Road+Aba" target="_blank" rel="noopener">Open in Google Maps</a>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="eyebrow">Community & Socials</div>
+        <h2 style="margin-bottom:10px;">Follow @esca_meals</h2>
+        <div class="row" style="gap:24px; margin-block:14px 18px;">
+          <div>
+            <div style="font:800 1.8rem var(--sans); color:var(--ink);" class="num">34K+</div>
+            <div class="small muted">likes on TikTok</div>
+          </div>
+          <div>
+            <div style="font:800 1.8rem var(--sans); color:var(--ink);" class="num">600+</div>
+            <div class="small muted">food videos</div>
+          </div>
+        </div>
+        <p class="small muted" style="margin-bottom:18px;">
+          Watch our snails sizzle in pepper sauce, see real customer platters, and review what is cooking in the kitchen this week.
+        </p>
+        <div class="row">
+          <a class="btn btn-dark btn-sm" href="https://www.tiktok.com/@esca_meals" target="_blank" rel="noopener">TikTok @esca_meals</a>
+          <a class="btn btn-ghost btn-sm" href="https://www.instagram.com/esca_meals" target="_blank" rel="noopener">Instagram</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const wa = ESCA.waLink("Hello Esca Meals! I would like to place an order.");
+  const waLink = document.getElementById('wa-contact-link');
+  if (waLink) waLink.href = wa;
+
+  const phoneEl = document.getElementById('contact-phone');
+  if (phoneEl) phoneEl.textContent = ESCA.B.PHONE;
+
+  try {
+    const menu = await ESCA.getMenu();
+    let feat = menu.filter(m => m.is_featured);
+    if (feat.length < 6) {
+      const extra = menu.filter(m => !m.is_featured);
+      feat = feat.concat(extra).slice(0, 6);
+    } else {
+      feat = feat.slice(0, 6);
+    }
+    const container = document.getElementById('featured-dishes');
+    if (feat.length) {
+      container.innerHTML = feat.map(m => `
+        <article class="dish" id="item-${m.id}">
+          ${Site.art(m)}
+          <div class="body">
+            <h3>${ESCA.esc(m.name)}</h3>
+            <p>${ESCA.esc(m.description || '')}</p>
+            <div class="foot">
+              <span class="price num">${Site.priceLabel(m)}</span>
+              <a class="btn btn-primary btn-sm" href="menu.html#item-${m.id}">Order</a>
+            </div>
+          </div>
+        </article>
+      `).join('');
+    } else {
+      container.innerHTML = '<p class="muted">Check our full menu for current offerings.</p>';
+    }
+  } catch (e) {
+    document.getElementById('featured-dishes').innerHTML = '<p class="notice err">Could not load featured dishes. Please refresh or contact us on WhatsApp.</p>';
+  }
+});
+</script>
+</body>
+</html>

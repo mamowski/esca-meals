@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Catering & Events | Esca Meals</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="assets/img/logo.svg">
+<link rel="stylesheet" href="assets/esca.css">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/site.js"></script>
+<style>
+  .cgrid {
+    display: grid;
+    grid-template-columns: 0.95fr 1.05fr;
+    gap: 32px;
+    align-items: start;
+  }
+  @media (max-width: 820px) {
+    .cgrid { grid-template-columns: 1fr; }
+  }
+  .catering-feature-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 0;
+    list-style: none;
+  }
+  .catering-feature-item {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .catering-feature-item b {
+    color: var(--ink);
+    display: block;
+    font-size: 0.92rem;
+    margin-bottom: 2px;
+  }
+  .catering-feature-item span {
+    color: var(--muted);
+    font-size: 0.84rem;
+  }
+  .dictate-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body data-page="catering">
+<main class="wrap" style="padding-top:28px; padding-bottom:36px;">
+  <div class="cgrid">
+    <div>
+      <div class="eyebrow">Catering and Events · Aba and nearby</div>
+      <h1 style="font-size:clamp(1.9rem,5.5vw,2.9rem); margin-bottom:12px;">Events, party trays and meal plans</h1>
+      <p class="muted" style="line-height:1.55; margin-bottom:20px;">
+        Birthdays, weddings, office meetings, family gatherings, or a structured weekly meal plan. Tell us your date, expected guest count, and your food preferences. Sonny will review and message you directly on WhatsApp with a personalized quote, usually within a few hours.
+      </p>
+
+      <ul class="catering-feature-list">
+        <li class="catering-feature-item">
+          <div style="color:var(--cocoa); font-weight:800; font-size:1.1rem; line-height:1; flex-shrink:0; margin-top:2px;">●</div>
+          <div>
+            <b>Party Food Trays</b>
+            <span>Jollof rice, fried rice, white rice with chicken stew, fried plantain, and seasoned proteins.</span>
+          </div>
+        </li>
+        <li class="catering-feature-item">
+          <div style="color:var(--cocoa); font-weight:800; font-size:1.1rem; line-height:1; flex-shrink:0; margin-top:2px;">●</div>
+          <div>
+            <b>Peppered Snail by the 100</b>
+            <span>100 pieces for ₦64,000, cleaned thoroughly and slow-tossed in rich scotch bonnet pepper sauce.</span>
+          </div>
+        </li>
+        <li class="catering-feature-item">
+          <div style="color:var(--cocoa); font-weight:800; font-size:1.1rem; line-height:1; flex-shrink:0; margin-top:2px;">●</div>
+          <div>
+            <b>Food Bowls by the Litre</b>
+            <span>1-litre, 2-litre, and family bowls of rich Nigerian soups, chicken stew, jollof rice, and village spaghetti for home or events.</span>
+          </div>
+        </li>
+        <li class="catering-feature-item">
+          <div style="color:var(--cocoa); font-weight:800; font-size:1.1rem; line-height:1; flex-shrink:0; margin-top:2px;">●</div>
+          <div>
+            <b>Weekly Meal Plans and Meal Prep</b>
+            <span>Cooked fresh and portioned into clean food bowls for your fridge or freezer so you save cooking time.</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Request Form -->
+    <form class="panel stack" id="form" novalidate style="background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:24px;">
+      <h3 style="margin:0">Request a custom quote</h3>
+      <p class="small muted" style="margin:0 0 10px;">Fill out this short form or use voice dictation. Sonny responds on WhatsApp.</p>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="f-name">Your full name</label>
+          <input id="f-name" autocomplete="name" required placeholder="e.g. Chioma Okeke">
+        </div>
+        <div class="field">
+          <label for="f-phone">WhatsApp phone number</label>
+          <input id="f-phone" type="tel" autocomplete="tel" placeholder="0813 794 5084" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-email">Email address <span class="muted">(optional)</span></label>
+        <input id="f-email" type="email" autocomplete="email" placeholder="name@example.com">
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="f-type">Event or service</label>
+          <select id="f-type">
+            <option>Birthday party</option>
+            <option>Wedding or introduction</option>
+            <option>Office or corporate lunch</option>
+            <option>Weekly meal plan and meal prep</option>
+            <option>Church or naming ceremony</option>
+            <option>Gift platter or food tray</option>
+            <option>Other special event</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-date">Event or start date</label>
+          <input id="f-date" type="date">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label for="f-guests">Estimated guest count</label>
+          <input id="f-guests" inputmode="numeric" placeholder="e.g. 50">
+        </div>
+        <div class="field">
+          <label for="f-budget">Estimated budget <span class="muted">(optional)</span></label>
+          <input id="f-budget" placeholder="e.g. ₦250,000">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-location">Event venue or delivery area in Aba</label>
+        <input id="f-location" placeholder="e.g. GRA, Umule, Ogbor Hill, Faulks Road">
+      </div>
+
+      <div class="field">
+        <label for="f-service">What dishes would you like?</label>
+        <input id="f-service" placeholder="e.g. Party rice trays, 50 pcs peppered snail, chicken wraps">
+      </div>
+
+      <div class="field">
+        <label for="f-details">Additional details or special instructions</label>
+        <textarea id="f-details" rows="3" placeholder="Tell us about serving staff needs, delivery timing, or allergy notes..."></textarea>
+        <div class="dictate-bar">
+          <span class="tiny muted" id="dictate-status">Tap microphone to dictate into the box</span>
+          <button type="button" class="btn btn-ghost btn-sm" id="dictate-btn" style="padding:4px 10px; font-size:0.8rem;">
+            Dictate to text
+          </button>
+        </div>
+      </div>
+
+      <div id="msg"></div>
+
+      <button class="btn btn-primary btn-block" type="submit" id="send">Send quote request →</button>
+    </form>
+  </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s), esc = ESCA.esc;
+  const item = new URLSearchParams(location.search).get('item');
+  if (item) $('#f-service').value = item;
+
+  $('#f-date').min = ESCA.todayISO();
+  const saved = ESCA.store.get('esca_customer', {});
+  $('#f-name').value = saved.name || '';
+  $('#f-phone').value = saved.phone || '';
+  $('#f-email').value = saved.email || '';
+
+  // Web Speech API Voice Dictation for the notes textarea
+  const dictateBtn = $('#dictate-btn');
+  const dictateStatus = $('#dictate-status');
+  const detailsField = $('#f-details');
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-NG';
+
+    let isDictating = false;
+
+    dictateBtn.onclick = () => {
+      if (!isDictating) {
+        try {
+          recognition.start();
+          isDictating = true;
+          dictateBtn.textContent = 'Listening... tap to stop';
+          dictateBtn.classList.add('recording');
+          dictateStatus.textContent = 'Speak clearly into your microphone...';
+        } catch (err) {
+          console.warn('Speech recognition error:', err);
+        }
+      } else {
+        recognition.stop();
+        isDictating = false;
+        dictateBtn.textContent = 'Dictate to text';
+        dictateBtn.classList.remove('recording');
+        dictateStatus.textContent = 'Dictation stopped';
+      }
+    };
+
+    recognition.onresult = event => {
+      const transcript = event.results[0][0].transcript;
+      const current = detailsField.value.trim();
+      detailsField.value = current ? `${current} ${transcript}` : transcript;
+      dictateStatus.textContent = 'Transcribed to text';
+    };
+
+    recognition.onerror = () => {
+      isDictating = false;
+      dictateBtn.textContent = 'Dictate to text';
+      dictateBtn.classList.remove('recording');
+      dictateStatus.textContent = 'Could not catch voice. Try again or type above.';
+    };
+
+    recognition.onend = () => {
+      isDictating = false;
+      dictateBtn.textContent = 'Dictate to text';
+      dictateBtn.classList.remove('recording');
+    };
+  } else {
+    if (dictateBtn) dictateBtn.style.display = 'none';
+    if (dictateStatus) dictateStatus.textContent = 'Type your event details above';
+  }
+
+  // Form submission
+  $('#form').onsubmit = async e => {
+    e.preventDefault();
+    const btn = $('#send');
+    btn.disabled = true;
+    btn.textContent = 'Sending request...';
+
+    const r = await ESCA.call('catering', {
+      name: $('#f-name').value,
+      phone: $('#f-phone').value,
+      email: $('#f-email').value,
+      event_type: $('#f-type').value,
+      event_date: $('#f-date').value,
+      guests: $('#f-guests').value,
+      budget: $('#f-budget').value,
+      location: $('#f-location').value,
+      service: $('#f-service').value,
+      details: $('#f-details').value
+    });
+
+    btn.disabled = false;
+    btn.textContent = 'Send quote request →';
+
+    if (!r.ok) {
+      $('#msg').innerHTML = `<div class="notice err">${esc(r.error || 'Something went wrong. Please check your details and try again, or message us on WhatsApp.')}</div>`;
+      return;
+    }
+
+    ESCA.store.set('esca_customer', {
+      ...saved,
+      name: $('#f-name').value,
+      phone: $('#f-phone').value,
+      email: $('#f-email').value
+    });
+
+    $('#form').innerHTML = `
+      <div class="stack" style="text-align:center; padding:18px 8px;">
+        <div style="display:flex; justify-content:center; color:var(--cocoa-dark);">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <h2 style="margin:4px 0 8px">Request received</h2>
+        <p class="muted" style="margin:0 0 16px; font-size:0.92rem;">
+          Reference <b>#${r.request_id}</b>${r.event_date_label ? ' for ' + esc(r.event_date_label) : ''}. Sonny has received your details and will message you on WhatsApp with your tailored quote.
+        </p>
+        <a class="btn btn-wa" target="_blank" rel="noopener" href="${ESCA.waLink('Hello Esca Meals, about my catering request #' + r.request_id)}">
+          Message Sonny on WhatsApp now
+        </a>
+      </div>
+    `;
+  };
+});
+</script>
+</body>
+</html>

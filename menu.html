@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Menu | Esca Meals</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="assets/img/logo.svg">
+<link rel="stylesheet" href="assets/esca.css">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/site.js"></script>
+<style>
+  .menu-header-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .date-picker-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .date-picker-bar label {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--ink);
+    margin: 0;
+  }
+  .date-input-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 14px;
+  }
+  .date-input-wrap input[type="date"] {
+    border: 0;
+    background: transparent;
+    font: 600 0.9rem var(--sans);
+    color: var(--ink);
+    padding: 0;
+    outline: none;
+    cursor: pointer;
+  }
+  .cats {
+    position: sticky;
+    top: calc(66px + env(safe-area-inset-top, 0px));
+    z-index: 30;
+    background: rgba(250, 248, 245, 0.96);
+    backdrop-filter: blur(8px);
+    padding-block: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .cats .wrap {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-inline: 16px;
+  }
+  .cats .wrap::-webkit-scrollbar { display: none; }
+  .cat-section {
+    scroll-margin-top: 130px;
+    padding-top: 32px;
+  }
+  .cat-section h2 {
+    font-size: 1.6rem;
+    margin-bottom: 16px;
+  }
+  .cartbar {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    z-index: 55;
+    width: min(520px, calc(100% - 32px));
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    background: #160e0a !important;
+    color: #ffffff !important;
+    border: 1.5px solid #d4a373 !important;
+    border-radius: 999px !important;
+    padding: 12px 20px !important;
+    min-height: 56px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .cartbar:hover {
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.6) !important;
+  }
+  .cartbar.show { display: flex !important; }
+  body.has-cart .wa-fab {
+    bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .opt-chip {
+    padding: 6px 12px;
+    font-size: 0.82rem;
+    transition: all 0.15s ease;
+  }
+  .opt-chip small {
+    font-weight: 600;
+    opacity: 0.85;
+    margin-left: 4px;
+  }
+  .opt-chip[aria-pressed="true"],
+  .opt-chip.active,
+  .opt-chip.on {
+    background: #24140e !important;
+    color: #ffffff !important;
+    border-color: #24140e !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 8px rgba(36, 20, 14, 0.25);
+  }
+  .opt-chip[aria-pressed="true"] small,
+  .opt-chip.active small,
+  .opt-chip.on small {
+    color: #d4a373 !important;
+    font-weight: 700 !important;
+    opacity: 1 !important;
+  }
+  .dish.sold-out {
+    opacity: 0.72;
+  }
+  .dish.sold-out .btn-primary {
+    background: var(--line-strong);
+    color: var(--muted);
+    cursor: not-allowed;
+  }
+</style>
+</head>
+<body data-page="menu">
+<main>
+  <section class="wrap" style="padding-top:24px; padding-bottom:12px;">
+    <div class="menu-header-card">
+      <div class="eyebrow">Cooked fresh on Umule Road, Aba</div>
+      <h1 style="font-size:clamp(1.9rem,5.5vw,2.8rem); margin-bottom:8px;">Our Kitchen Menu</h1>
+      <p class="muted" style="margin:0; font-size:0.92rem;" id="intro">
+        Choose your food, select your delivery or pickup date, and pay securely online.
+      </p>
+
+      <div class="date-picker-bar">
+        <label for="menu-date-input">Cooking date:</label>
+        <div class="date-input-wrap">
+          <input type="date" id="menu-date-input" aria-label="Select date for menu availability">
+        </div>
+        <span class="small muted" id="date-status-pill">Checking daily portions...</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sticky Categories Navigation -->
+  <nav class="cats" aria-label="Menu categories">
+    <div class="wrap" id="cats"></div>
+  </nav>
+
+  <!-- Dishes Container -->
+  <div class="wrap" id="menu">
+    <p class="muted" style="padding-block:30px">Loading the menu...</p>
+  </div>
+</main>
+
+<!-- Floating Checkout Bar -->
+<button class="cartbar" id="cartbar" type="button" data-open-cart aria-label="Open cart and checkout">
+  <div style="display:flex; align-items:center; gap:10px;">
+    <span id="cartbar-badge" style="background:#e5b98a; color:#160e0a; border-radius:999px; width:26px; height:26px; display:inline-flex; align-items:center; justify-content:center; font-weight:800; font-size:0.85rem;">0</span>
+    <span style="font-weight:700; font-size:1rem; color:#ffffff; letter-spacing:0.01em;">Checkout</span>
+  </div>
+  <div style="display:flex; align-items:center; gap:8px;">
+    <b class="num" id="cartbar-total" style="font-size:1.05rem; font-weight:700; color:#e5b98a;">₦0</b>
+    <span style="font-size:1.15rem; font-weight:700; color:#ffffff;">→</span>
+  </div>
+</button>
+
+<!-- Cart & Checkout Drawer -->
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer" aria-label="Your order" aria-hidden="true">
+  <header>
+    <h3 style="margin:0" id="drawer-title">Your order</h3>
+    <button class="x" id="close-drawer" type="button" aria-label="Close">x</button>
+  </header>
+  <div class="body" id="drawer-body"></div>
+  <div class="foot" id="drawer-foot"></div>
+</aside>
+
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const $ = s => document.querySelector(s), esc = ESCA.esc, money = ESCA.money;
+  let menu = [], settings = {}, step = 'cart', fulfil = 'pickup', slot = null;
+  let selectedDate = null;
+  const saved = ESCA.store.get('esca_customer', {});
+
+  try {
+    settings = await ESCA.getSettings();
+  } catch (e) {
+    $('#menu').innerHTML = `<p class="notice err">We could not load kitchen settings. Please refresh, or WhatsApp us on ${esc(ESCA.B.PHONE)}.</p>`;
+    return;
+  }
+
+  const earliest = ESCA.earliestDate(settings);
+  const maxDate = ESCA.addDays(ESCA.todayISO(), Number(settings.max_days_ahead || 30));
+  const savedDate = ESCA.store.get('esca_cooking_date');
+  selectedDate = (savedDate && savedDate >= earliest && savedDate <= maxDate) ? savedDate : earliest;
+
+  const dateInput = $('#menu-date-input');
+  dateInput.min = earliest;
+  dateInput.max = maxDate;
+  dateInput.value = selectedDate;
+
+  $('#intro').innerHTML = `Choose your food, then select your date and time window. The earliest date we can cook for is <b>${esc(ESCA.fmtDate(earliest))}</b>. All prices in Nigerian naira.`;
+
+  // Load menu for the chosen date
+  async function loadDayMenu(d) {
+    selectedDate = d;
+    ESCA.store.set('esca_cooking_date', d);
+    if (dateInput && dateInput.value !== d) dateInput.value = d;
+    const cDate = $('#c-date');
+    if (cDate && cDate.value !== d) cDate.value = d;
+    $('#date-status-pill').textContent = `Showing portions for ${ESCA.fmtDate(d)}`;
+    try {
+      const res = await ESCA.getDayMenu(d);
+      menu = (res.items || []).map(m => ({
+        ...m,
+        id: m.menu_item_id || m.id,
+        menu_item_id: m.menu_item_id || m.id,
+        options: (m.options || []).map(o => ({
+          ...o,
+          id: o.option_id || o.id,
+          option_id: o.option_id || o.id
+        }))
+      }));
+      clampCartPortions(menu, d);
+      renderMenu();
+    } catch (e) {
+      console.warn('getDayMenu fallback to getMenu:', e);
+      const resMenu = await ESCA.getMenu();
+      menu = (resMenu || []).map(m => ({
+        ...m,
+        id: m.menu_item_id || m.id,
+        menu_item_id: m.menu_item_id || m.id,
+        options: (m.options || []).map(o => ({
+          ...o,
+          id: o.option_id || o.id,
+          option_id: o.option_id || o.id
+        }))
+      }));
+      clampCartPortions(menu, d);
+      renderMenu();
+    }
+  }
+
+  function clampCartPortions(menuList, d) {
+    const cartItems = Site.Cart.items();
+    let cartAdjusted = false;
+    for (const m of (menuList || [])) {
+      const mid = m.menu_item_id || m.id;
+      const pl = m.portions_left;
+      if (pl != null) {
+        const dishItems = cartItems.filter(i => i.menu_item_id === mid);
+        const totalInCart = dishItems.reduce((a, b) => a + b.qty, 0);
+        if (totalInCart > pl) {
+          cartAdjusted = true;
+          let excess = totalInCart - pl;
+          for (const it of dishItems) {
+            if (excess <= 0) break;
+            const reduction = Math.min(it.qty, excess);
+            it.qty -= reduction;
+            excess -= reduction;
+          }
+        }
+      }
+    }
+    if (cartAdjusted) {
+      Site.Cart.save(cartItems.filter(i => i.qty > 0));
+      Site.toast(`Cart updated to match daily portion limits for ${ESCA.fmtDate(d)}.`);
+      if ($('#drawer') && $('#drawer').classList.contains('open')) renderDrawer();
+    }
+  }
+
+  dateInput.onchange = e => {
+    const val = e.target.value;
+    if (val && val >= earliest) {
+      loadDayMenu(val);
+    }
+  };
+
+  const chosen = {};   // item id -> option id
+
+  function card(m) {
+    const mid = m.menu_item_id || m.id;
+    if (m.options && m.options.length && !chosen[mid]) {
+      const firstOpt = m.options[0];
+      chosen[mid] = firstOpt.option_id || firstOpt.id;
+    }
+    const orderable = (m.options && m.options.length) || m.price != null;
+    const pl = m.portions_left;
+    const isSoldOut = pl === 0;
+
+    let portionBadge = '';
+    if (isSoldOut) {
+      portionBadge = `<span class="badge bad">Sold out for ${esc(ESCA.fmtDate(selectedDate, { weekday: 'short', day: 'numeric', month: 'short' }))}</span>`;
+    } else if (pl != null && pl <= 5) {
+      portionBadge = `<span class="badge warn">Only ${pl} portion${pl === 1 ? '' : 's'} left</span>`;
+    }
+
+    const opts = (m.options || []).map(o => {
+      const oid = o.option_id || o.id;
+      const isSelected = chosen[mid] === oid;
+      return `
+      <button type="button" class="chip opt-chip ${isSelected ? 'active on' : ''}" data-opt="${mid}:${oid}" aria-pressed="${isSelected}">
+        ${esc(o.option_name)} <small class="num">${money(o.price)}</small>
+      </button>
+    `;
+    }).join('');
+
+    let actionBtn = '';
+    if (!orderable) {
+      actionBtn = `<span class="small muted">Price on request</span><span class="spacer"></span><a class="btn btn-ghost btn-sm" href="catering.html?item=${encodeURIComponent(m.name)}">Request quote</a>`;
+    } else if (isSoldOut) {
+      const selectedOpt = chosen[mid] ? m.options.find(o => (o.option_id || o.id) === chosen[mid]) : null;
+      actionBtn = `<span class="price num muted" data-price="${mid}">${selectedOpt ? money(selectedOpt.price) : Site.priceLabel(m)}</span><span class="spacer"></span><button class="btn btn-sm" type="button" disabled style="opacity:0.6">Sold out</button>`;
+    } else {
+      const selectedOpt = chosen[mid] ? m.options.find(o => (o.option_id || o.id) === chosen[mid]) : null;
+      actionBtn = `<span class="price num" data-price="${mid}">${selectedOpt ? money(selectedOpt.price) : Site.priceLabel(m)}</span><span class="spacer"></span><button class="btn btn-primary btn-sm" type="button" data-add="${mid}">Add</button>`;
+    }
+
+    return `<article class="dish ${isSoldOut ? 'sold-out' : ''}" id="item-${mid}">
+      ${Site.art(m)}
+      <div class="body">
+        ${portionBadge ? `<div class="row" style="gap:6px; flex-wrap:wrap;">${portionBadge}</div>` : ''}
+        <h3>${esc(m.name)}</h3>
+        <p>${esc(m.description || '')}</p>
+        ${opts ? `<div class="opts" role="group" aria-label="${esc(m.options[0]?.group_name || 'Portion size')}">${opts}</div>` : ''}
+        <div class="foot">
+          ${actionBtn}
+        </div>
+      </div>
+    </article>`;
+  }
+
+  function renderMenu() {
+    const cats = [...new Set(menu.map(m => m.category))];
+    const slug = c => 'cat-' + c.toLowerCase().replace(/[^a-z]+/g, '-');
+
+    $('#cats').innerHTML = cats.map((c, i) => `
+      <a class="chip ${i === 0 ? 'on' : ''}" href="#${slug(c)}">${esc(c)}</a>
+    `).join('');
+
+    $('#menu').innerHTML = cats.map(c => `
+      <section class="cat-section" id="${slug(c)}">
+        <h2>${esc(c)}</h2>
+        <div class="dishes">
+          ${menu.filter(m => m.category === c).map(card).join('')}
+        </div>
+      </section>
+    `).join('') + `
+      <div class="panel" style="margin-top:36px; padding:22px; background:var(--surface);">
+        <h3 style="margin:0 0 6px">Custom requests or catering</h3>
+        <p class="muted small" style="margin:0 0 14px">Need large portions for a party, office lunch, or church event? Or have specific food allergies?</p>
+        <div class="row">
+          <a class="btn btn-ghost btn-sm" href="catering.html">Request a catering quote</a>
+          <a class="btn btn-ghost btn-sm" href="chat.html">Ask Esca</a>
+        </div>
+      </div>
+    `;
+
+    // Category intersection observer
+    const io = new IntersectionObserver(es => {
+      es.forEach(e => {
+        if (e.isIntersecting) {
+          document.querySelectorAll('#cats .chip').forEach(a => {
+            a.classList.toggle('on', a.getAttribute('href') === '#' + e.target.id);
+          });
+        }
+      });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+
+    document.querySelectorAll('.cat-section').forEach(s => io.observe(s));
+  }
+
+  // Handle option selection and adding to cart
+  $('#menu').addEventListener('click', e => {
+    const ob = e.target.closest('[data-opt]');
+    if (ob) {
+      const [mid, oid] = ob.dataset.opt.split(':').map(Number);
+      chosen[mid] = oid;
+      ob.parentElement.querySelectorAll('[data-opt]').forEach(b => {
+        const isTarget = b === ob;
+        b.setAttribute('aria-pressed', isTarget);
+        b.classList.toggle('active', isTarget);
+        b.classList.toggle('on', isTarget);
+      });
+      const m = menu.find(x => (x.menu_item_id || x.id) === mid);
+      if (m && m.options) {
+        const found = m.options.find(o => (o.option_id || o.id) === oid);
+        if (found) $(`[data-price="${mid}"]`).textContent = money(found.price);
+      }
+      return;
+    }
+
+    const ab = e.target.closest('[data-add]');
+    if (!ab) return;
+
+    const dishId = Number(ab.dataset.add);
+    const m = menu.find(x => (x.menu_item_id || x.id) === dishId);
+    if (!m) return;
+    const mid = m.menu_item_id || m.id;
+
+    const pl = m.portions_left;
+    if (pl === 0) {
+      Site.toast(`Sold out for ${ESCA.fmtDate(selectedDate)}`);
+      return;
+    }
+    const currentInCart = Site.Cart.items().filter(i => (i.menu_item_id || i.id) === mid).reduce((a, b) => a + b.qty, 0);
+    if (pl != null && (currentInCart + 1) > pl) {
+      Site.toast(`Only ${pl} portion${pl === 1 ? '' : 's'} available for ${ESCA.fmtDate(selectedDate)}.`);
+      return;
+    }
+
+    let opt = null;
+    if (m.options && m.options.length) {
+      if (!chosen[mid]) {
+        const firstOpt = m.options[0];
+        chosen[mid] = firstOpt.option_id || firstOpt.id;
+      }
+      opt = m.options.find(o => (o.option_id || o.id) === chosen[mid]) || m.options[0];
+    }
+
+    const added = Site.Cart.add(m, opt || null);
+    if (added) {
+      const orig = ab.textContent;
+      ab.textContent = 'Added';
+      ab.style.opacity = '0.9';
+      setTimeout(() => {
+        ab.textContent = orig;
+        ab.style.opacity = '';
+      }, 900);
+    }
+  });
+
+  // ---------- cart bar ----------
+  function bar() {
+    const n = Site.Cart.count();
+    $('#cartbar').classList.toggle('show', n > 0);
+    document.body.classList.toggle('has-cart', n > 0);
+    if ($('#cartbar-badge')) $('#cartbar-badge').textContent = n;
+    if ($('#cartbar-total')) $('#cartbar-total').textContent = money(Site.Cart.total());
+  }
+
+  document.addEventListener('cart-changed', () => {
+    bar();
+    if ($('#drawer').classList.contains('open')) renderDrawer();
+  });
+  bar();
+
+  // ---------- drawer ----------
+  function openDrawer() {
+    step = 'cart';
+    $('#drawer').classList.add('open');
+    $('#overlay').classList.add('open');
+    $('#drawer').setAttribute('aria-hidden', 'false');
+    renderDrawer();
+  }
+
+  function closeDrawer() {
+    $('#drawer').classList.remove('open');
+    $('#overlay').classList.remove('open');
+    $('#drawer').setAttribute('aria-hidden', 'true');
+  }
+
+  document.addEventListener('click', e => {
+    if (e.target.closest('[data-open-cart]')) {
+      e.preventDefault();
+      openDrawer();
+    }
+  });
+
+  $('#overlay').onclick = closeDrawer;
+  $('#close-drawer').onclick = closeDrawer;
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
+  if (location.hash === '#cart') openDrawer();
+
+  const zones = settings.delivery_zones || [];
+  function fee() {
+    if (fulfil !== 'delivery') return 0;
+    const z = zones.find(z => z.id === ($('#c-zone')?.value || saved.zone));
+    return z ? Number(z.fee) : 0;
+  }
+
+  function totalsHTML() {
+    const sub = Site.Cart.total();
+    const f = fee();
+    return `<div class="ticket" style="padding:16px 18px">
+      <div class="line"><span>Food subtotal</span><b class="num">${money(sub)}</b></div>
+      ${fulfil === 'delivery' ? `<div class="line"><span>Delivery fee</span><b class="num">${f ? money(f) : 'select area'}</b></div>` : ''}
+      <div class="total"><span>Total</span><span class="num">${money(sub + f)}</span></div>
+    </div>`;
+  }
+
+  function linesHTML() {
+    return Site.Cart.items().map(i => `
+      <div class="cart-line">
+        <div>
+          <b>${esc(i.name)}</b>
+          ${i.option_name ? `<div class="small muted">${esc(i.option_name)}</div>` : ''}
+          <div class="small muted num">${money(i.unit)} each</div>
+        </div>
+        <div class="qty">
+          <button type="button" data-dec="${i.key}" aria-label="One less">-</button>
+          <span>${i.qty}</span>
+          <button type="button" data-inc="${i.key}" aria-label="One more">+</button>
+        </div>
+        <b class="num" style="min-width:80px; text-align:right">${money(i.qty * i.unit)}</b>
+      </div>
+    `).join('');
+  }
+
+  function renderDrawer() {
+    const body = $('#drawer-body');
+    const foot = $('#drawer-foot');
+    const items = Site.Cart.items();
+
+    if (!items.length) {
+      $('#drawer-title').textContent = 'Your order';
+      body.innerHTML = '<p class="muted">Your order is empty. Browse the menu and add items to order.</p>';
+      foot.innerHTML = '';
+      return;
+    }
+
+    if (step === 'cart') {
+      $('#drawer-title').textContent = 'Your order';
+      body.innerHTML = `
+        <div class="row" style="align-items:center; justify-content:space-between; margin-bottom:10px;">
+          <span class="small muted">${Site.Cart.count()} item${Site.Cart.count() === 1 ? '' : 's'} in order</span>
+          <button class="btn btn-ghost btn-sm" type="button" id="clear-cart-btn" style="padding:4px 10px; font-size:0.78rem;">Empty cart</button>
+        </div>
+        ${linesHTML()}
+        ${totalsHTML()}
+      `;
+      foot.innerHTML = `<button class="btn btn-primary btn-block" type="button" id="to-details">Choose date and delivery →</button>`;
+      $('#to-details').onclick = () => { step = 'details'; renderDrawer(); };
+      if ($('#clear-cart-btn')) $('#clear-cart-btn').onclick = () => { Site.Cart.clear(); renderDrawer(); };
+    } else {
+      $('#drawer-title').textContent = 'Checkout';
+      const slots = settings.time_slots || [];
+      const orderDate = selectedDate || earliest;
+
+      body.innerHTML = `
+        <div class="row" style="align-items:center; justify-content:space-between; margin-bottom:8px;">
+          <button class="btn btn-ghost btn-sm" type="button" id="back">← Back to order</button>
+          <button class="btn btn-ghost btn-sm" type="button" id="clear-cart-checkout" style="padding:4px 10px; font-size:0.78rem;">Empty cart</button>
+        </div>
+
+        <div class="seg" role="group" aria-label="Fulfilment choice">
+          <button type="button" data-ful="pickup" aria-pressed="${fulfil === 'pickup'}">Kitchen Pickup</button>
+          <button type="button" data-ful="delivery" aria-pressed="${fulfil === 'delivery'}">Doorstep Delivery</button>
+        </div>
+
+        ${fulfil === 'pickup' ? `
+          <div class="notice info small">
+            Pick up fresh at <b>${esc(ESCA.B.ADDRESS)}</b>. Bring your order confirmation code when collecting.
+          </div>
+        ` : `
+          <div class="field">
+            <label for="c-zone">Delivery area in Aba</label>
+            <select id="c-zone">
+              <option value="">Choose your area...</option>
+              ${zones.map(z => `<option value="${esc(z.id)}" ${saved.zone === z.id ? 'selected' : ''}>${esc(z.name)} (${money(z.fee)})</option>`).join('')}
+            </select>
+          </div>
+          <div class="field">
+            <label for="c-addr">Delivery address</label>
+            <textarea id="c-addr" autocomplete="street-address" placeholder="House number, street name, and area">${esc(saved.address || '')}</textarea>
+          </div>
+          <div class="field">
+            <label for="c-landmark">Nearest landmark</label>
+            <input id="c-landmark" value="${esc(saved.landmark || '')}" placeholder="e.g. Opposite the church, blue gate">
+          </div>
+        `}
+
+        <div class="field">
+          <label for="c-date">${fulfil === 'pickup' ? 'Pickup' : 'Delivery'} date</label>
+          <input id="c-date" type="date" min="${earliest}" max="${maxDate}" value="${orderDate}">
+          <span class="hint">Earliest cooking date: ${esc(ESCA.fmtDate(earliest))}</span>
+        </div>
+
+        <div class="field">
+          <span class="label">Time window</span>
+          <div class="slots" role="group" aria-label="Time window">
+            ${slots.map(s => `<button type="button" class="chip" data-slot="${esc(s)}" aria-pressed="${slot === s}">${esc(s.replace('-', ' to '))}</button>`).join('')}
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="c-name">Your name</label>
+            <input id="c-name" autocomplete="name" value="${esc(saved.name || '')}">
+          </div>
+          <div class="field">
+            <label for="c-phone">WhatsApp phone number</label>
+            <input id="c-phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="0813 794 5084" value="${esc(saved.phone || '')}">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="c-email">Email <span class="muted">(optional, for payment receipt)</span></label>
+          <input id="c-email" type="email" autocomplete="email" value="${esc(saved.email || '')}">
+        </div>
+
+        <div class="field">
+          <label for="c-notes">Kitchen notes <span class="muted">(optional)</span></label>
+          <input id="c-notes" placeholder="Less pepper, extra sauce, allergy note...">
+        </div>
+
+        <div id="checkout-msg"></div>
+
+        <details class="small" open style="margin-top:10px">
+          <summary style="cursor:pointer; font-weight:600; padding:4px 0;">Order summary (${Site.Cart.count()} item${Site.Cart.count() === 1 ? '' : 's'})</summary>
+          <div style="margin-top:8px">${linesHTML()}</div>
+        </details>
+
+        <div id="totals">${totalsHTML()}</div>
+      `;
+
+      foot.innerHTML = `
+        <button class="btn btn-primary btn-block" type="button" id="pay">Pay ${money(Site.Cart.total() + fee())} securely</button>
+        <div class="tiny muted" style="text-align:center; margin-top:6px;">
+          Pay with card or bank transfer. We start cooking fresh once payment is confirmed.
+        </div>
+      `;
+
+      $('#back').onclick = () => { step = 'cart'; renderDrawer(); };
+      if ($('#clear-cart-checkout')) $('#clear-cart-checkout').onclick = () => { Site.Cart.clear(); step = 'cart'; renderDrawer(); };
+      $('#pay').onclick = pay;
+
+      body.querySelectorAll('[data-ful]').forEach(b => b.onclick = () => {
+        keep();
+        fulfil = b.dataset.ful;
+        renderDrawer();
+      });
+
+      body.querySelectorAll('[data-slot]').forEach(b => b.onclick = () => {
+        slot = b.dataset.slot;
+        body.querySelectorAll('[data-slot]').forEach(x => x.setAttribute('aria-pressed', x === b));
+      });
+
+      const cDateInput = $('#c-date');
+      if (cDateInput) {
+        cDateInput.onchange = e => {
+          const val = e.target.value;
+          if (val && val >= earliest) {
+            loadDayMenu(val);
+          }
+        };
+      }
+
+      const z = $('#c-zone');
+      if (z) {
+        z.onchange = () => {
+          $('#totals').innerHTML = totalsHTML();
+          $('#pay').textContent = `Pay ${money(Site.Cart.total() + fee())} securely`;
+        };
+      }
+    }
+
+    body.querySelectorAll('[data-inc]').forEach(b => b.onclick = () => {
+      const it = Site.Cart.items().find(i => i.key === b.dataset.inc);
+      if (it) {
+        const dish = menu.find(m => (m.menu_item_id || m.id) === it.menu_item_id);
+        const pl = dish ? dish.portions_left : null;
+        const totalDishInCart = Site.Cart.items().filter(i => i.menu_item_id === it.menu_item_id).reduce((a, b) => a + b.qty, 0);
+        if (pl != null && (totalDishInCart + 1) > pl) {
+          Site.toast(`Only ${pl} portion${pl === 1 ? '' : 's'} available for ${ESCA.fmtDate(selectedDate)}.`);
+          return;
+        }
+        Site.Cart.setQty(it.key, it.qty + 1);
+        renderDrawer();
+      }
+    });
+
+    body.querySelectorAll('[data-dec]').forEach(b => b.onclick = () => {
+      const it = Site.Cart.items().find(i => i.key === b.dataset.dec);
+      if (it) {
+        Site.Cart.setQty(it.key, it.qty - 1);
+        renderDrawer();
+      }
+    });
+  }
+
+  function keep() {
+    const v = id => ($('#' + id)?.value ?? undefined);
+    Object.assign(saved, Object.fromEntries(Object.entries({
+      name: v('c-name'),
+      phone: v('c-phone'),
+      email: v('c-email'),
+      zone: v('c-zone'),
+      address: v('c-addr'),
+      landmark: v('c-landmark')
+    }).filter(([, x]) => x !== undefined)));
+    ESCA.store.set('esca_customer', saved);
+  }
+
+  async function pay() {
+    keep();
+    const msg = $('#checkout-msg');
+    const btn = $('#pay');
+
+    if (!slot) {
+      msg.innerHTML = '<div class="notice err">Please select a time window for your order.</div>';
+      return;
+    }
+
+    if (fulfil === 'delivery' && !$('#c-zone')?.value) {
+      msg.innerHTML = '<div class="notice err">Please choose your delivery area.</div>';
+      return;
+    }
+
+    const orderDate = $('#c-date')?.value || selectedDate;
+
+    btn.disabled = true;
+    btn.textContent = 'Opening secure payment...';
+    msg.innerHTML = '';
+
+    const r = await ESCA.call('place_order', {
+      channel: 'website',
+      fulfilment: fulfil,
+      delivery_zone: $('#c-zone')?.value || '',
+      address: $('#c-addr')?.value || '',
+      landmark: $('#c-landmark')?.value || '',
+      date: orderDate,
+      time_slot: slot,
+      notes: $('#c-notes')?.value || '',
+      customer: {
+        name: $('#c-name')?.value || '',
+        phone: $('#c-phone')?.value || '',
+        email: $('#c-email')?.value || ''
+      },
+      items: Site.Cart.items().map(i => ({
+        menu_item_id: i.menu_item_id,
+        option_id: i.option_id,
+        name: i.name,
+        option_name: i.option_name,
+        unit_price: i.unit,
+        quantity: i.qty
+      })),
+    });
+
+    if (!r.ok || !r.checkout_url) {
+      btn.disabled = false;
+      btn.textContent = `Pay ${money(Site.Cart.total() + fee())} securely`;
+      msg.innerHTML = `<div class="notice err">${esc(r.error || 'Something went wrong. Please check your order details and try again.')}</div>`;
+      msg.scrollIntoView({ block: 'center' });
+      return;
+    }
+
+    ESCA.store.set('esca_pending', { code: r.code, cart: Site.Cart.items(), at: Date.now() });
+    location.href = r.checkout_url;
+  }
+
+  // Initial load
+  await loadDayMenu(earliest);
+
+  if (location.hash.startsWith('#item-')) {
+    const el = document.querySelector(location.hash);
+    if (el) el.scrollIntoView({ block: 'center' });
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ask Esca | Esca Meals</title>
+<meta name="description" content="Chat with Ask Esca for Esca Meals. Ask about food bowls, peppered snail, prices, delivery areas, and catering in Aba.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="assets/img/logo.svg">
+<link rel="stylesheet" href="assets/esca.css">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/site.js"></script>
+<style>
+  .chat-page-container {
+    max-width: 680px;
+    margin: 20px auto 40px;
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 180px);
+  }
+  @media (max-width: 680px) {
+    .chat-page-container {
+      margin: 0;
+      border-radius: 0;
+      border: none;
+      min-height: calc(100vh - 120px);
+    }
+  }
+  .chat-page-head {
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--ink);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--cocoa-soft);
+  }
+  .back-btn:hover { text-decoration: none; background: var(--line); }
+  .chat-page-title h1 {
+    font-size: 1.25rem;
+    margin: 0;
+    line-height: 1.1;
+  }
+  .chat-page-title p {
+    margin: 2px 0 0;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .chat-page-log {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: var(--bg);
+  }
+  .chat-suggestions {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 12px 16px;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    scrollbar-width: none;
+  }
+  .chat-suggestions::-webkit-scrollbar { display: none; }
+  .sugg-chip {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border: 1px solid var(--line);
+    background: var(--cocoa-soft);
+    color: var(--ink);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .sugg-chip:hover { background: var(--line); }
+  .chat-page-form {
+    display: flex;
+    gap: 8px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+    align-items: center;
+  }
+  .chat-page-form input {
+    flex: 1;
+    min-height: 44px;
+    padding: 10px 14px;
+  }
+  .mic-action-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 50%;
+    border: 1.5px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+  .mic-action-btn:hover { background: var(--cocoa-soft); border-color: var(--cocoa); }
+  .mic-action-btn.recording {
+    background: var(--cocoa-dark);
+    color: #fff;
+    border-color: var(--cocoa-dark);
+    animation: mic-pulse 1.2s infinite;
+  }
+  @keyframes mic-pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 48, 36, 0.6); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(74, 48, 36, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 48, 36, 0); }
+  }
+</style>
+</head>
+<body data-page="chat">
+<main class="wrap" style="padding-block:16px;">
+  <div class="chat-page-container">
+    <div class="chat-page-head">
+      <a href="index.html" class="back-btn">← Back</a>
+      <img src="assets/img/logo.svg" alt="" width="34" height="34">
+      <div class="chat-page-title">
+        <h1>Ask Esca</h1>
+        <p>Chat with us for menu, portions, prices, and catering questions</p>
+      </div>
+    </div>
+
+    <div class="chat-page-log" id="chat-log" aria-live="polite"></div>
+
+    <!-- Quick suggestions -->
+    <div class="chat-suggestions">
+      <button type="button" class="sugg-chip" onclick="askSugg('How much is the peppered snail?')">Peppered snail price?</button>
+      <button type="button" class="sugg-chip" onclick="askSugg('What soups do you have by the litre?')">Soups by the litre?</button>
+      <button type="button" class="sugg-chip" onclick="askSugg('What are your delivery areas in Aba?')">Delivery areas & fees?</button>
+      <button type="button" class="sugg-chip" onclick="askSugg('How do I order a party food tray?')">Party food trays?</button>
+    </div>
+
+    <!-- Text Chat Input Form with Free Speech-to-Text Dictation -->
+    <form class="chat-page-form" id="chat-form">
+      <input id="chat-input" name="q" autocomplete="off" placeholder="Type a message or tap mic to dictate..." aria-label="Message">
+      <button class="mic-action-btn" id="mic-btn" type="button" aria-label="Dictate message" title="Dictate to text">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      </button>
+      <button class="btn btn-primary btn-sm" type="submit">Send</button>
+    </form>
+  </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s);
+  const esc = ESCA.esc, store = ESCA.store;
+  const linkify = t => esc(t).replace(/(https?:\/\/[^\s<]+|pay\.html\?[^\s<]+)/g, u => `<a href="${u}" target="_blank" rel="noopener">${u.includes('pay') || u.includes('bachs') ? 'Open payment page →' : u}</a>`);
+
+  function sessionId() {
+    let id = store.get('esca_chat_session', null);
+    if (!id) {
+      id = Math.random().toString(36).slice(2) + Date.now().toString(36);
+      store.set('esca_chat_session', id);
+    }
+    return id;
+  }
+
+  const log = $('#chat-log');
+  function addMsg(who, text, save = true) {
+    const d = document.createElement('div');
+    d.className = 'msg ' + who;
+    d.innerHTML = linkify(text);
+    log.appendChild(d);
+    log.scrollTop = log.scrollHeight;
+    if (save) {
+      const h = store.get('esca_chat_history', []);
+      h.push({ who, text });
+      store.set('esca_chat_history', h.slice(-40));
+    }
+    return d;
+  }
+
+  async function sendMsg(text) {
+    addMsg('me', text);
+    const t = addMsg('bot', 'Ask Esca is typing…', false);
+    try {
+      const reply = await ESCA.chat(sessionId(), text);
+      t.remove();
+      addMsg('bot', reply);
+    } catch (e) {
+      t.remove();
+      addMsg('bot', `Sorry, I had trouble connecting. Please use the Menu page, or WhatsApp Sonny on ${ESCA.B.PHONE}.`);
+    }
+  }
+
+  // Load history or welcome message
+  const hist = store.get('esca_chat_history', []);
+  if (hist.length) {
+    hist.forEach(m => addMsg(m.who, m.text, false));
+  } else {
+    addMsg('bot', "Hello! I am Ask Esca. Ask me about our peppered snail, soup bowls by the litre, chicken wraps, delivery across Aba, or catering quotes.", false);
+  }
+
+  $('#chat-form').onsubmit = e => {
+    e.preventDefault();
+    const v = $('#chat-input').value.trim();
+    if (v) {
+      $('#chat-input').value = '';
+      sendMsg(v);
+    }
+  };
+
+  window.askSugg = text => {
+    sendMsg(text);
+  };
+
+  // Voice Note recognition
+  const micBtn = $('#mic-btn');
+  const input = $('#chat-input');
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null;
+  let isListening = false;
+
+  if (SpeechRec) {
+    rec = new SpeechRec();
+    rec.continuous = false;
+    rec.interimResults = false;
+    rec.lang = 'en-NG';
+    rec.onstart = () => {
+      isListening = true;
+      micBtn.classList.add('recording');
+      input.placeholder = 'Listening... speak now';
+      Site.toast('Listening... speak to dictate into the box');
+    };
+    rec.onresult = e => {
+      const transcript = e.results[0][0].transcript;
+      if (transcript) {
+        const prev = input.value.trim();
+        input.value = prev ? `${prev} ${transcript}` : transcript;
+        input.focus();
+        Site.toast('Transcribed to text. Tap Send when ready.');
+      }
+    };
+    rec.onerror = e => {
+      isListening = false;
+      micBtn.classList.remove('recording');
+      input.placeholder = 'Type a message or tap mic to dictate...';
+      if (e.error === 'not-allowed') {
+        Site.toast('Microphone access blocked. Please allow mic in browser settings.');
+      } else {
+        Site.toast('Could not catch voice. Try again or type your message.');
+      }
+    };
+    rec.onend = () => {
+      isListening = false;
+      micBtn.classList.remove('recording');
+      input.placeholder = 'Type a message or tap mic to dictate...';
+    };
+
+    micBtn.onclick = () => {
+      if (isListening) rec.stop();
+      else {
+        try { rec.start(); }
+        catch (err) { rec.stop(); }
+      }
+    };
+  } else {
+    micBtn.onclick = () => {
+      Site.toast('Tip: On your phone keyboard, tap the microphone to dictate your text.');
+    };
+  }
+});
+</script>
+</body>
+</html>
