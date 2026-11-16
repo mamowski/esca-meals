@@ -23,8 +23,8 @@ window.ESCA_CONFIG = {
   BUSINESS: {
     NAME: 'Esca Meals',
     TAGLINE: 'Food that looks good and tastes even better',
-    WHATSAPP: '2348137945084',          // international format, no +
-    PHONE: '0813 794 5084',
+    WHATSAPP: '2349052862612',          // TEST number: change back to 2348137945084 at handover
+    PHONE: '0905 286 2612',
     ADDRESS: 'Umule Road, Aba, Abia State',
     INSTAGRAM: 'esca_meals',
     TIKTOK: 'esca_meals',
