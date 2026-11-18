@@ -137,7 +137,7 @@
       ['index.html#services', 'Our Services', 'services'],
       ['catering.html', 'Catering & Events', 'catering'],
       ['track.html', 'Track Order', 'track'],
-      ['chat.html', 'Ask Esca', 'chat']
+      ['chat.html', 'Ask Mamz', 'chat']
     ];
 
     const header = document.createElement('div');
@@ -230,7 +230,7 @@
             <a href="index.html#services">Our Services</a><br>
             <a href="catering.html">Catering & Events</a><br>
             <a href="track.html">Track Your Order</a><br>
-            <a href="chat.html">Ask Assistant</a>
+            <a href="chat.html">Ask Mamz</a>
           </p>
         </div>
         <div>

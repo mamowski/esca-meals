@@ -1579,7 +1579,7 @@
     v.innerHTML = `
       <div style="margin-bottom:14px;">
         <h2 style="margin:0; font-size:1.35rem; font-weight:700;">Customer WhatsApp Feedback</h2>
-        <span class="small muted">Post-meal reviews received via Ask Esca automated WhatsApp check-ins.</span>
+        <span class="small muted">Post-meal reviews received via Ask Mamz automated WhatsApp check-ins.</span>
       </div>
 
       <div class="menu-atelier-table-wrap">
@@ -1719,7 +1719,7 @@
               <input id="set-biz-hours" value="${esc(b.opening_hours || 'Monday to Saturday: 8:00 AM - 8:00 PM · Sunday: Closed (Advance pre-orders only)')}">
             </div>
             <div class="field" style="margin:0;">
-              <label class="small muted" for="set-biz-services">Services & Catering offerings (Feeds Ask Esca)</label>
+              <label class="small muted" for="set-biz-services">Services & Catering offerings (Feeds Ask Mamz)</label>
               <textarea id="set-biz-services" rows="4" style="width:100%; border:1px solid var(--canvas-border); border-radius:8px; padding:10px; font-size:0.86rem; resize:vertical;">${esc(s.services || '')}</textarea>
             </div>
           </div>

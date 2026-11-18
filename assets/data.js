@@ -1179,7 +1179,7 @@
     if (/cater|party|event|wedding|tray|birthday/.test(t)) return 'We cater parties, weddings and office events with food trays, small chops and platters. Send the details on the Catering page and Mamoke will reply with a quote.';
     if (/where|address|location|contact|phone|whatsapp/.test(t)) return `We are on ${B.ADDRESS}. WhatsApp or call ${B.PHONE}. Instagram & TikTok: @${B.INSTAGRAM}.`;
     if (/order|status|track/.test(t)) return 'You can track an order on the Track page with your order code (ESC-...) or your phone number.';
-    return `Hi! I am your kitchen assistant. Ask me about our peppered snail, food bowls, wraps, delivery areas, dates, or catering quotes.`;
+    return `Hi! I am Ask Mamz. Ask me about our peppered snail, food bowls, wraps, delivery areas, dates, or catering quotes.`;
   }
 
   // ---------------------------------------------------------------- staff dashboard
