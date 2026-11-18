@@ -21,13 +21,13 @@ window.ESCA_CONFIG = {
   TELEGRAM_BOT: '',
 
   BUSINESS: {
-    NAME: 'Esca Meals',
+    NAME: "Mamoke's Kitchen",
     TAGLINE: 'Food that looks good and tastes even better',
-    WHATSAPP: '2349052862612',          // TEST number: change back to 2348137945084 at handover
+    WHATSAPP: '2349052862612',
     PHONE: '0905 286 2612',
-    ADDRESS: 'Umule Road, Aba, Abia State',
-    INSTAGRAM: 'esca_meals',
-    TIKTOK: 'esca_meals',
+    ADDRESS: '123 Kitchen Avenue, Victoria Island, Lagos',
+    INSTAGRAM: 'mamokes_kitchen',
+    TIKTOK: 'mamokes_kitchen',
   },
 
   TIMEZONE: 'Africa/Lagos',

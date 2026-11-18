@@ -1,4 +1,4 @@
-/* Esca Meals Kitchen Pass (Staff Only) */
+/* Mamoke's Kitchen Pass (Staff Only) */
 (function () {
   const { esc, money, admin: A, fmtDate, todayISO, addDays } = ESCA;
   const $ = s => document.querySelector(s);
@@ -95,7 +95,7 @@
       app.innerHTML = `
         <div class="panel stack" style="max-width:540px; margin:40px auto;">
           <h2>Staff Account Pending Approval</h2>
-          <p class="muted">Your staff account (<b>${esc(CUR.user.email)}</b>) is waiting for Sonny to approve it under <b>Team</b>.</p>
+          <p class="muted">Your staff account (<b>${esc(CUR.user.email)}</b>) is waiting for Mamoke to approve it under <b>Team</b>.</p>
           <button class="btn btn-ghost btn-sm" id="btn-recheck" type="button" style="align-self:flex-start;">Check again</button>
         </div>`;
       $('#btn-recheck').onclick = () => location.reload();
@@ -155,7 +155,7 @@
       }
       const r = await A.signUp($('#r-email').value, $('#r-pass').value, $('#r-name').value);
       $('#r-msg').innerHTML = r.ok
-        ? `<div class="notice ok">Registered. Ask Sonny to approve your account under Team.</div>`
+        ? `<div class="notice ok">Registered. Ask Mamoke to approve your account under Team.</div>`
         : `<div class="notice err">${esc(r.error)}</div>`;
     };
   }
@@ -278,7 +278,7 @@
       if ($('#stat-deliveries-today')) $('#stat-deliveries-today').textContent = deliveries;
       if ($('#stat-pickups-today')) $('#stat-pickups-today').textContent = pickups;
 
-      // Mobile metric strip for Sonny's phone
+      // Mobile metric strip for Mamoke's phone
       if ($('#m-stat-orders')) $('#m-stat-orders').textContent = paidOrders.length;
       if ($('#m-stat-revenue')) $('#m-stat-revenue').textContent = money(revenue);
       if ($('#m-stat-deliveries')) $('#m-stat-deliveries').textContent = deliveries;
@@ -694,8 +694,8 @@
       : `<span class="badge warn">${esc(o.payment_status)}</span>`;
 
     const fulInfo = o.fulfilment === 'delivery'
-      ? `Aba Delivery (${esc(o.delivery_zone || '')}): ${esc(o.address || '')}${o.landmark ? ` (${esc(o.landmark)})` : ''}`
-      : `Kitchen Pickup (Umule Road, Aba)`;
+      ? `Delivery (${esc(o.delivery_zone || '')}): ${esc(o.address || '')}${o.landmark ? ` (${esc(o.landmark)})` : ''}`
+      : `Kitchen Pickup (${esc(ESCA.B.ADDRESS || 'Kitchen')})`;
 
     return `
       <div class="order-docket" data-status="${o.status}">
@@ -1254,7 +1254,7 @@
         toast('No items currently marked to buy!');
         return;
       }
-      let text = `Esca Meals Market Shopping List (${new Date().toLocaleDateString('en-GB')})\n`;
+      let text = `${ESCA.B.NAME || "Mamoke's Kitchen"} Market Shopping List (${new Date().toLocaleDateString('en-GB')})\n`;
       text += `Total estimated budget: ${money(estSpend)}\n\n`;
       shoppingList.forEach(x => {
         text += `${x.is_bought ? '[x]' : '[ ]'} ${x.name} (${x.quantity || 'As needed'})${x.estimated_cost ? ' - ' + money(x.estimated_cost) : ''}${x.market_vendor ? ' [' + x.market_vendor + ']' : ''}\n`;
@@ -1527,7 +1527,7 @@
               ` : ''}
 
               <div class="catering-card-actions">
-                <a class="btn btn-wa btn-sm" href="${wa(r.phone, `Hello ${clientName.split(' ')[0]}, this is Sonny from Esca Meals regarding your catering enquiry.`)}" target="_blank" rel="noopener">
+                <a class="btn btn-wa btn-sm" href="${wa(r.phone, `Hello ${clientName.split(' ')[0]}, this is Mamoke from ${ESCA.B.NAME || "Mamoke's Kitchen"} regarding your catering enquiry.`)}" target="_blank" rel="noopener">
                   WhatsApp ${esc(r.phone)}
                 </a>
                 <div class="catering-quote-wrap">
@@ -1643,7 +1643,7 @@
             <div class="grid-2">
               <div class="field" style="margin:0;">
                 <label class="small muted" for="set-biz-name">Kitchen / Business name</label>
-                <input id="set-biz-name" value="${esc(b.name || 'Esca Meals')}">
+                <input id="set-biz-name" value="${esc(b.name || (ESCA.B && ESCA.B.NAME) || "Mamoke's Kitchen")}">
               </div>
               <div class="field" style="margin:0;">
                 <label class="small muted" for="set-biz-tagline">Tagline</label>
@@ -1652,8 +1652,8 @@
             </div>
 
             <div class="field" style="margin:0;">
-              <label class="small muted" for="set-biz-about">About Sonny & Esca Meals (Public Brand Story)</label>
-              <textarea id="set-biz-about" rows="3" style="width:100%; border:1px solid var(--canvas-border); border-radius:8px; padding:10px; font-size:0.86rem; resize:vertical;">${esc(b.about_story || 'Esca Meals is an online kitchen and boutique catering studio based on Umule Road, Aba, founded by Sonny. Every soup bowl, protein pack, and catering tray is prepared from scratch with market-fresh local ingredients, traditional Nigerian flavours, and modern food styling.')}</textarea>
+              <label class="small muted" for="set-biz-about">About Mamoke & Kitchen (Public Brand Story)</label>
+              <textarea id="set-biz-about" rows="3" style="width:100%; border:1px solid var(--canvas-border); border-radius:8px; padding:10px; font-size:0.86rem; resize:vertical;">${esc(b.about_story || "Mamoke's Kitchen is an online kitchen and boutique catering studio. Every soup bowl, protein pack, and catering tray is prepared from scratch with market-fresh local ingredients, traditional Nigerian flavours, and modern food styling.")}</textarea>
             </div>
 
             <div class="field" style="margin:0;">
@@ -1677,32 +1677,32 @@
           </div>
           <div class="stack" style="gap:10px;">
             <div class="field" style="margin:0;">
-              <label class="small muted" for="set-biz-address">Pickup address in Aba</label>
-              <input id="set-biz-address" value="${esc(b.pickup_address || 'Umule Road, Aba, Abia State')}">
+              <label class="small muted" for="set-biz-address">Pickup address</label>
+              <input id="set-biz-address" value="${esc(b.pickup_address || ESCA.B.ADDRESS || '123 Kitchen Avenue, Victoria Island, Lagos')}">
             </div>
             <div class="grid-2">
               <div class="field" style="margin:0;">
                 <label class="small muted" for="set-biz-phone">Kitchen phone</label>
-                <input id="set-biz-phone" value="${esc(b.phone || '0813 794 5084')}">
+                <input id="set-biz-phone" value="${esc(b.phone || ESCA.B.PHONE || '0905 286 2612')}">
               </div>
               <div class="field" style="margin:0;">
                 <label class="small muted" for="set-biz-wa">WhatsApp number</label>
-                <input id="set-biz-wa" value="${esc(b.whatsapp || '2348137945084')}">
+                <input id="set-biz-wa" value="${esc(b.whatsapp || ESCA.B.WHATSAPP || '2349052862612')}">
               </div>
             </div>
             <div class="grid-2">
               <div class="field" style="margin:0;">
                 <label class="small muted" for="set-biz-email">Contact email</label>
-                <input id="set-biz-email" value="${esc(b.email || 'sonny@escameals.ng')}">
+                <input id="set-biz-email" value="${esc(b.email || 'mamoke@mamokeskitchen.ng')}">
               </div>
               <div class="field" style="margin:0;">
                 <label class="small muted" for="set-biz-ig">Instagram handle</label>
-                <input id="set-biz-ig" value="${esc(b.instagram || '@esca_meals')}">
+                <input id="set-biz-ig" value="${esc(b.instagram || '@mamokes_kitchen')}">
               </div>
             </div>
             <div class="field" style="margin:0;">
               <label class="small muted" for="set-biz-tiktok">TikTok handle</label>
-              <input id="set-biz-tiktok" value="${esc(b.tiktok || '@esca_meals')}">
+              <input id="set-biz-tiktok" value="${esc(b.tiktok || '@mamokes_kitchen')}">
             </div>
           </div>
         </div>
@@ -2120,7 +2120,7 @@
       // Button 2: Send link on WhatsApp
       $('#btn-no-send-wa').onclick = () => {
         const phone10 = String(r.customer?.phone || phone).replace(/\D/g, '').slice(-10);
-        const msg = `Hello ${r.customer?.name || name}, your Esca Meals order ${r.code} (${money(r.total)}) has been created. Here is your secure payment link: ${payUrl}`;
+        const msg = `Hello ${r.customer?.name || name}, your order ${r.code} (${money(r.total)}) from ${ESCA.B.NAME || "Mamoke's Kitchen"} has been created. Here is your secure payment link: ${payUrl}`;
         window.open(`https://wa.me/234${phone10}?text=${encodeURIComponent(msg)}`, '_blank');
       };
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Payment | Esca Meals</title>
+<title>Payment | Mamoke's Kitchen</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
 
           <div>
-            <div class="small muted">Esca Meals · Order ${esc(o.code)}</div>
+            <div class="small muted">${esc(ESCA.B.NAME || "Mamoke's Kitchen")} · Order ${esc(o.code)}</div>
             <div style="font:700 2.2rem var(--display); color:var(--ink);" class="num">${money(o.total)}</div>
           </div>
 
@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
 
           <p class="small muted" style="margin-top:12px;">
-            Keep your order code <b>${esc(o.code)}</b> for reference. For any question, WhatsApp Sonny on <b>${esc(ESCA.B.PHONE)}</b>.
+            Keep your order code <b>${esc(o.code)}</b> for reference. For any question, WhatsApp Mamoke on <b>${esc(ESCA.B.PHONE)}</b>.
           </p>
         </div>
       `;
@@ -183,10 +183,10 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="payment-state-card stack">
           <h1 style="font-size:1.9rem; margin:0;">Partial payment received</h1>
           <div class="notice warn">
-            Order <b>${esc(o.code)}</b>: The amount received was less than ${money(o.total)}. Sonny will reach out on WhatsApp to resolve this, or you can message us directly.
+            Order <b>${esc(o.code)}</b>: The amount received was less than ${money(o.total)}. Mamoke will reach out on WhatsApp to resolve this, or you can message us directly.
           </div>
           <a class="btn btn-wa" target="_blank" rel="noopener" href="${ESCA.waLink('Hello, about partial payment on order ' + o.code)}">
-            Message Sonny on WhatsApp
+            Message Mamoke on WhatsApp
           </a>
         </div>
       `;
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="row" style="gap:10px;">
             <a class="btn btn-primary" href="menu.html#cart">Review cart and reorder</a>
             <a class="btn btn-wa" target="_blank" rel="noopener" href="${ESCA.waLink('Hello, I need help with order ' + o.code)}">
-              WhatsApp Sonny
+              WhatsApp Mamoke
             </a>
           </div>
         </div>

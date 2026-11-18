@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Menu | Esca Meals</title>
+<title>Menu | Mamoke's Kitchen</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -149,7 +149,7 @@
 <main>
   <section class="wrap" style="padding-top:24px; padding-bottom:12px;">
     <div class="menu-header-card">
-      <div class="eyebrow">Cooked fresh on Umule Road, Aba</div>
+      <div class="eyebrow">Cooked fresh to order</div>
       <h1 style="font-size:clamp(1.9rem,5.5vw,2.8rem); margin-bottom:8px;">Our Kitchen Menu</h1>
       <p class="muted" style="margin:0; font-size:0.92rem;" id="intro">
         Choose your food, select your delivery or pickup date, and pay securely online.
@@ -375,7 +375,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <p class="muted small" style="margin:0 0 14px">Need large portions for a party, office lunch, or church event? Or have specific food allergies?</p>
         <div class="row">
           <a class="btn btn-ghost btn-sm" href="catering.html">Request a catering quote</a>
-          <a class="btn btn-ghost btn-sm" href="chat.html">Ask Esca</a>
+          <a class="btn btn-ghost btn-sm" href="chat.html">Ask Assistant</a>
         </div>
       </div>
     `;
@@ -578,7 +578,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         ` : `
           <div class="field">
-            <label for="c-zone">Delivery area in Aba</label>
+            <label for="c-zone">Delivery area</label>
             <select id="c-zone">
               <option value="">Choose your area...</option>
               ${zones.map(z => `<option value="${esc(z.id)}" ${saved.zone === z.id ? 'selected' : ''}>${esc(z.name)} (${money(z.fee)})</option>`).join('')}
@@ -614,7 +614,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
           <div class="field">
             <label for="c-phone">WhatsApp phone number</label>
-            <input id="c-phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="0813 794 5084" value="${esc(saved.phone || '')}">
+            <input id="c-phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="0905 286 2612" value="${esc(saved.phone || '')}">
           </div>
         </div>
 

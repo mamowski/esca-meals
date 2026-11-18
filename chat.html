@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Ask Esca | Esca Meals</title>
-<meta name="description" content="Chat with Ask Esca for Esca Meals. Ask about food bowls, peppered snail, prices, delivery areas, and catering in Aba.">
+<title>Ask Assistant | Mamoke's Kitchen</title>
+<meta name="description" content="Chat with the kitchen assistant for Mamoke's Kitchen. Ask about food bowls, peppered snail, prices, delivery areas, and catering.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap" rel="stylesheet">
@@ -146,7 +146,7 @@
       <a href="index.html" class="back-btn">← Back</a>
       <img src="assets/img/logo.svg" alt="" width="34" height="34">
       <div class="chat-page-title">
-        <h1>Ask Esca</h1>
+        <h1>Ask Assistant</h1>
         <p>Chat with us for menu, portions, prices, and catering questions</p>
       </div>
     </div>
@@ -157,7 +157,7 @@
     <div class="chat-suggestions">
       <button type="button" class="sugg-chip" onclick="askSugg('How much is the peppered snail?')">Peppered snail price?</button>
       <button type="button" class="sugg-chip" onclick="askSugg('What soups do you have by the litre?')">Soups by the litre?</button>
-      <button type="button" class="sugg-chip" onclick="askSugg('What are your delivery areas in Aba?')">Delivery areas & fees?</button>
+      <button type="button" class="sugg-chip" onclick="askSugg('What are your delivery areas?')">Delivery areas & fees?</button>
       <button type="button" class="sugg-chip" onclick="askSugg('How do I order a party food tray?')">Party food trays?</button>
     </div>
 
@@ -204,14 +204,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function sendMsg(text) {
     addMsg('me', text);
-    const t = addMsg('bot', 'Ask Esca is typing…', false);
+    const t = addMsg('bot', 'Assistant is typing…', false);
     try {
       const reply = await ESCA.chat(sessionId(), text);
       t.remove();
       addMsg('bot', reply);
     } catch (e) {
       t.remove();
-      addMsg('bot', `Sorry, I had trouble connecting. Please use the Menu page, or WhatsApp Sonny on ${ESCA.B.PHONE}.`);
+      addMsg('bot', `Sorry, I had trouble connecting. Please use the Menu page, or WhatsApp Mamoke on ${ESCA.B.PHONE}.`);
     }
   }
 
@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (hist.length) {
     hist.forEach(m => addMsg(m.who, m.text, false));
   } else {
-    addMsg('bot', "Hello! I am Ask Esca. Ask me about our peppered snail, soup bowls by the litre, chicken wraps, delivery across Aba, or catering quotes.", false);
+    addMsg('bot', "Hello! I am your kitchen assistant. Ask me about our peppered snail, soup bowls by the litre, chicken wraps, delivery options, or catering quotes.", false);
   }
 
   $('#chat-form').onsubmit = e => {

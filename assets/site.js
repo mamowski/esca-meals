@@ -143,16 +143,16 @@
     const header = document.createElement('div');
     header.innerHTML = `
       <div class="announcement-bar">
-        ● Umule Road, Aba · <b>Order by 8:00 PM for next-day delivery</b> · WhatsApp: ${esc(B.PHONE)}
+        ${esc(B.ADDRESS ? B.ADDRESS.split(',')[0] : 'Online Kitchen')} · <b>Order by 8:00 PM for next-day delivery</b> · WhatsApp: ${esc(B.PHONE)}
       </div>
       ${ESCA.DEMO ? '<div class="demo-banner">Demo mode: orders are saved in this browser and payment is simulated. Add your Supabase and n8n details in <b>config.js</b> to go live.</div>' : ''}
       <header class="site-header">
         <div class="wrap">
           <a class="brand" href="index.html">
-            <img src="assets/img/logo.svg" alt="Esca Meals" width="38" height="38">
+            <img src="assets/img/logo.svg" alt="${esc(B.NAME)}" width="38" height="38">
             <span>
               <b>${esc(B.NAME)}</b>
-              <small>Aba · Umule Road</small>
+              <small>${esc(B.ADDRESS ? B.ADDRESS.split(',')[0] : 'Online Kitchen')}</small>
             </span>
           </a>
           <div style="display:flex; align-items:center; gap:8px; margin-left:auto;">
@@ -171,7 +171,7 @@
           </div>
           <nav class="nav" id="main-nav" aria-label="Main Navigation">
             ${nav.map(([h, t, p]) => `<a href="${h}" class="${p === page ? 'active' : ''}">${t}</a>`).join('')}
-            <a href="${ESCA.waLink('Hello Esca Meals!')}" target="_blank" rel="noopener" style="color:#25D366; font-weight:700;">
+            <a href="${ESCA.waLink('Hello ' + (B.NAME || 'Kitchen') + '!')}" target="_blank" rel="noopener" style="color:#25D366; font-weight:700;">
               Chat on WhatsApp
             </a>
           </nav>
@@ -202,10 +202,10 @@
     // Single Floating WhatsApp Button (bottom right on all pages)
     const wa = document.createElement('a');
     wa.className = 'wa-fab';
-    wa.href = ESCA.waLink('Hello Esca Meals! I would like to order.');
+    wa.href = ESCA.waLink('Hello ' + (B.NAME || 'Kitchen') + '! I would like to order.');
     wa.target = '_blank';
     wa.rel = 'noopener';
-    wa.setAttribute('aria-label', 'Chat with Sonny on WhatsApp');
+    wa.setAttribute('aria-label', 'Chat with Mamoke on WhatsApp');
     wa.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>';
     document.body.appendChild(wa);
 
@@ -220,7 +220,7 @@
             <span><b>${esc(B.NAME)}</b></span>
           </div>
           <p class="small" style="margin-top:12px; max-width:32em;">
-            ${esc(B.TAGLINE)}. Home cooked food bowls, peppered snail, rich soups and stews by the litre, chicken wraps, weekly meal plans and party trays, cooked fresh to order in Aba.
+            ${esc(B.TAGLINE)}. Home cooked food bowls, peppered snail, rich soups and stews by the litre, chicken wraps, weekly meal plans and party trays, cooked fresh to order.
           </p>
         </div>
         <div>
@@ -230,7 +230,7 @@
             <a href="index.html#services">Our Services</a><br>
             <a href="catering.html">Catering & Events</a><br>
             <a href="track.html">Track Your Order</a><br>
-            <a href="chat.html">Ask Esca</a>
+            <a href="chat.html">Ask Assistant</a>
           </p>
         </div>
         <div>
@@ -238,7 +238,7 @@
           <p class="small">
             ${esc(B.ADDRESS)}<br>
             WhatsApp or call: <span style="user-select:all; font-weight:700;">${esc(B.PHONE)}</span><br>
-            <a href="${ESCA.waLink('Hello Esca Meals!')}" target="_blank" rel="noopener">Open WhatsApp Chat →</a>
+            <a href="${ESCA.waLink('Hello ' + (B.NAME || 'Kitchen') + '!')}" target="_blank" rel="noopener">Open WhatsApp Chat →</a>
           </p>
         </div>
         <div>
@@ -246,7 +246,7 @@
           <p class="small">
             <a href="https://www.tiktok.com/@${esc(B.TIKTOK)}" target="_blank" rel="noopener">TikTok @${esc(B.TIKTOK)}</a><br>
             <a href="https://www.instagram.com/${esc(B.INSTAGRAM)}" target="_blank" rel="noopener">Instagram @${esc(B.INSTAGRAM)}</a><br>
-            ${ESCA.C.TELEGRAM_BOT ? `<a href="https://t.me/${esc(ESCA.C.TELEGRAM_BOT)}" target="_blank" rel="noopener">Ask Esca on Telegram</a><br>` : ''}
+            ${ESCA.C.TELEGRAM_BOT ? `<a href="https://t.me/${esc(ESCA.C.TELEGRAM_BOT)}" target="_blank" rel="noopener">Ask on Telegram</a><br>` : ''}
             <a href="admin/" style="opacity:0.75;">Staff Dashboard</a>
           </p>
         </div>
@@ -273,7 +273,7 @@
           bar.style.background = '#24140e';
           bar.style.color = '#fff';
         } else {
-          bar.innerHTML = `Umule Road, Aba · <b>Order by 8:00 PM for next-day delivery</b> · WhatsApp: ${esc(b.phone || B.PHONE)}`;
+          bar.innerHTML = `${esc(b.pickup_address || B.ADDRESS || 'Online Kitchen')} · <b>Order by 8:00 PM for next-day delivery</b> · WhatsApp: ${esc(b.phone || B.PHONE)}`;
         }
       }
 
@@ -283,10 +283,10 @@
       }
 
       const phoneEl = document.querySelector('#contact-phone');
-      if (phoneEl && b.phone) phoneEl.textContent = b.phone;
+      if (phoneEl && (b.phone || B.PHONE)) phoneEl.textContent = b.phone || B.PHONE;
       const waLink = document.querySelector('#wa-contact-link');
-      if (waLink && b.whatsapp) {
-        waLink.href = `https://wa.me/${String(b.whatsapp).replace(/\D/g, '')}?text=${encodeURIComponent('Hello Esca Meals!')}`;
+      if (waLink && (b.whatsapp || B.WHATSAPP)) {
+        waLink.href = `https://wa.me/${String(b.whatsapp || B.WHATSAPP).replace(/\D/g, '')}?text=${encodeURIComponent('Hello ' + (B.NAME || 'Kitchen') + '!')}`;
       }
     } catch (e) {}
   }

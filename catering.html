@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Catering & Events | Esca Meals</title>
+<title>Catering & Events | Mamoke's Kitchen</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -65,7 +65,7 @@
       <div class="eyebrow">Catering and Events · Aba and nearby</div>
       <h1 style="font-size:clamp(1.9rem,5.5vw,2.9rem); margin-bottom:12px;">Events, party trays and meal plans</h1>
       <p class="muted" style="line-height:1.55; margin-bottom:20px;">
-        Birthdays, weddings, office meetings, family gatherings, or a structured weekly meal plan. Tell us your date, expected guest count, and your food preferences. Sonny will review and message you directly on WhatsApp with a personalized quote, usually within a few hours.
+        Birthdays, weddings, office meetings, family gatherings, or a structured weekly meal plan. Tell us your date, expected guest count, and your food preferences. Mamoke will review and message you directly on WhatsApp with a personalized quote, usually within a few hours.
       </p>
 
       <ul class="catering-feature-list">
@@ -103,7 +103,7 @@
     <!-- Request Form -->
     <form class="panel stack" id="form" novalidate style="background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:24px;">
       <h3 style="margin:0">Request a custom quote</h3>
-      <p class="small muted" style="margin:0 0 10px;">Fill out this short form or use voice dictation. Sonny responds on WhatsApp.</p>
+      <p class="small muted" style="margin:0 0 10px;">Fill out this short form or use voice dictation. Mamoke responds on WhatsApp.</p>
 
       <div class="grid-2">
         <div class="field">
@@ -112,7 +112,7 @@
         </div>
         <div class="field">
           <label for="f-phone">WhatsApp phone number</label>
-          <input id="f-phone" type="tel" autocomplete="tel" placeholder="0813 794 5084" required>
+          <input id="f-phone" type="tel" autocomplete="tel" placeholder="0905 286 2612" required>
         </div>
       </div>
 
@@ -291,10 +291,10 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
         <h2 style="margin:4px 0 8px">Request received</h2>
         <p class="muted" style="margin:0 0 16px; font-size:0.92rem;">
-          Reference <b>#${r.request_id}</b>${r.event_date_label ? ' for ' + esc(r.event_date_label) : ''}. Sonny has received your details and will message you on WhatsApp with your tailored quote.
+          Reference <b>#${r.request_id}</b>${r.event_date_label ? ' for ' + esc(r.event_date_label) : ''}. Mamoke has received your details and will message you on WhatsApp with your tailored quote.
         </p>
-        <a class="btn btn-wa" target="_blank" rel="noopener" href="${ESCA.waLink('Hello Esca Meals, about my catering request #' + r.request_id)}">
-          Message Sonny on WhatsApp now
+        <a class="btn btn-wa" target="_blank" rel="noopener" href="${ESCA.waLink('Hello ' + (ESCA.B.NAME || 'Mamoke') + ', about my catering request #' + r.request_id)}">
+          Message Mamoke on WhatsApp now
         </a>
       </div>
     `;

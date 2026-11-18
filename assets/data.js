@@ -39,16 +39,16 @@
   // ---------------------------------------------------------------- demo data (mirrors 03_seed.sql)
   const SEED_SETTINGS = {
     business: {
-      name: B.NAME || 'Esca Meals',
+      name: B.NAME || "Mamoke's Kitchen",
       tagline: B.TAGLINE || 'Food that looks good and tastes even better',
-      city: 'Aba',
-      pickup_address: B.ADDRESS || 'Umule Road, Aba, Abia State',
-      whatsapp: B.WHATSAPP || '2348137945084',
-      phone: B.PHONE || '0813 794 5084',
-      email: 'sonny@escameals.ng',
-      instagram: B.INSTAGRAM || 'esca_meals',
-      tiktok: B.TIKTOK || 'esca_meals',
-      about_story: 'Esca Meals is an online kitchen and boutique catering studio based on Umule Road, Aba, founded by Sonny. Every soup bowl, protein pack, and catering tray is prepared from scratch with market-fresh local ingredients, traditional Nigerian flavours, and modern food styling.',
+      city: 'Lagos',
+      pickup_address: B.ADDRESS || '123 Kitchen Avenue, Victoria Island, Lagos',
+      whatsapp: B.WHATSAPP || '2349052862612',
+      phone: B.PHONE || '0905 286 2612',
+      email: 'mamoke@mamokeskitchen.ng',
+      instagram: B.INSTAGRAM || 'mamokes_kitchen',
+      tiktok: B.TIKTOK || 'mamokes_kitchen',
+      about_story: "Mamoke's Kitchen is an online kitchen and boutique catering studio. Every soup bowl, protein pack, and catering tray is prepared from scratch with market-fresh local ingredients, traditional Nigerian flavours, and modern food styling.",
       announcement_banner: 'Taking advance catering orders for weekend events · Please order 48 hours ahead',
       announcement_active: false,
       opening_hours: 'Monday to Saturday: 8:00 AM - 8:00 PM · Sunday: Closed (Advance pre-orders only)',
@@ -56,7 +56,7 @@
     timezone: TZ, currency: 'NGN', min_lead_days: 1, max_days_ahead: 30, order_cutoff: '20:00',
     time_slots: ['10:00-12:00', '12:00-14:00', '14:00-16:00', '16:00-18:00', '18:00-20:00'],
     max_orders_per_day: 25, closed_dates: [], payment_minutes: 30,
-    services: 'Online kitchen and caterer in Aba. Pre-ordered meals, weekly meal plans and meal prep, event catering, party food trays, small chops, peppered snail, food bowls by the litre (rich soups, stews, jollof and fried rice, village spaghetti, beans), wraps, salads, smoothies, juice, gift platters, seafood boil on request. Prices follow market costs; Sonny confirms every quote.',
+    services: 'Online kitchen and caterer. Pre-ordered meals, weekly meal plans and meal prep, event catering, party food trays, small chops, peppered snail, food bowls by the litre (rich soups, stews, jollof and fried rice, village spaghetti, beans), wraps, salads, smoothies, juice, gift platters, seafood boil on request. Prices follow market costs; Mamoke confirms every quote.',
     feedback_delay_minutes: 60, whatsapp: { owner_number: '', handover_minutes: 60 }, site_url: '', bachs_api_base: 'https://sandbox-api.bachs.io',
     delivery_zones: [
       { id: 'aba_central', name: 'Aba (within town)', fee: 2000 },
@@ -131,7 +131,7 @@
     });
     s.seq = { menu_items: s.menu_items.length, menu_item_options: s.menu_item_options.length, orders: 0, order_items: 0, catering_requests: 0 };
     s.users = [{ id: 'demo-owner', email: 'owner@escameals.demo', password: 'EscaDemo123' }];
-    s.profiles = [{ id: 'demo-owner', email: 'owner@escameals.demo', full_name: 'Sonny', role: 'admin', created_at: new Date().toISOString() }];
+    s.profiles = [{ id: 'demo-owner', email: 'owner@escameals.demo', full_name: 'Mamoke', role: 'admin', created_at: new Date().toISOString() }];
 
     const today = todayISO();
     const rawOrdersToday = [
@@ -306,7 +306,7 @@
         address: null,
         landmark: null,
         time_slot: '14:00-16:00',
-        notes: 'Sonny knows my taste, mild pepper please.',
+        notes: 'Mamoke knows my taste, mild pepper please.',
         subtotal: 22000,
         delivery_fee: 0,
         total: 22000,
@@ -976,7 +976,7 @@
   const newCode = () => { const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c; do { c = 'ESC-' + Array.from({ length: 6 }, () => a[Math.floor(Math.random() * a.length)]).join(''); } while (demo().orders.some(o => o.code === c)); return c; };
   const optionsFor = (s, id) => s.menu_item_options.filter(o => o.menu_item_id === id).sort((a, b) => a.sort_order - b.sort_order || a.id - b.id);
   const ordersOn = (s, d) => s.orders.filter(o => o.fulfil_date === d && o.status !== 'cancelled').length;
-  // portions Sonny set for a date: null = no limit; a "special" (date_only) with no number that day = 0
+  // portions set for a date: null = no limit; a "special" (date_only) with no number that day = 0
   const portionsSet = (s, id, d) => { const r = (s.dish_date_portions ||= []).find(p => p.menu_item_id === id && p.avail_date === d); if (r) return r.portions; return s.menu_items.find(m => m.id === id)?.date_only ? 0 : null; };
   const portionsBooked = (s, id, d) => s.order_items.filter(i => i.menu_item_id === id && s.orders.some(o => o.id === i.order_id && o.fulfil_date === d && o.status !== 'cancelled')).reduce((a, i) => a + i.quantity, 0);
   const portionsLeft = (s, id, d) => { const set = portionsSet(s, id, d); return set == null ? null : Math.max(set - portionsBooked(s, id, d), 0); };
@@ -1035,7 +1035,7 @@
     place_order(p, quiet) {
       const s = demo(); const st = s.settings; const cu = p.customer || {};
       const name = String(cu.name || '').trim(), phone = String(cu.phone || '').trim(), email = String(cu.email || '').trim().toLowerCase();
-      if (!name || digits(phone).length < 10) return err('missing_customer', 'Please give your name and a valid phone number (e.g. 0813 794 5084)');
+      if (!name || digits(phone).length < 10) return err('missing_customer', 'Please give your name and a valid phone number (e.g. 0905 286 2612)');
       if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return err('invalid_email', 'That email address does not look right');
       if (!['delivery', 'pickup'].includes(p.fulfilment)) return err('invalid_fulfilment', 'Choose delivery or pickup');
       let zone = null, fee = 0;
@@ -1173,13 +1173,13 @@
     await new Promise(r => setTimeout(r, 450)); const t = text.toLowerCase(); const s = demo(); const st = s.settings;
     if (/snail/.test(t)) return 'Our peppered snail comes in packs of 25 pieces (₦16,000), 50 pieces (₦32,000) and 100 pieces (₦64,000). Add it on the Menu page and choose your date.';
     if (/wrap|healthy|salad|smoothie|juice/.test(t)) return 'Our chicken wrap is ₦7,000, or ₦9,500 with Chapman. Beef and turkey wraps, salads, smoothies and fresh fruit juice are available on the Menu page.';
-    if (/deliver|zone|area|fee/.test(t)) return 'We deliver around Aba:\n' + st.delivery_zones.map(z => `• ${z.name}: ${money(z.fee)}`).join('\n') + `\n\nOr pick up at ${B.ADDRESS}.`;
+    if (/deliver|zone|area|fee/.test(t)) return 'We deliver locally:\n' + st.delivery_zones.map(z => `• ${z.name}: ${money(z.fee)}`).join('\n') + `\n\nOr pick up at ${B.ADDRESS}.`;
     if (/when|today|tomorrow|date|time|slot/.test(t)) return `Everything is cooked fresh to order. The earliest date you can order for is ${fmtDate(earliestDate(st))}, in these time slots: ${st.time_slots.join(', ')}.`;
     if (/pay|bank|card|transfer/.test(t)) return 'You pay online through a secure payment page, by card or bank transfer. We start cooking once payment is confirmed.';
-    if (/cater|party|event|wedding|tray|birthday/.test(t)) return 'We cater parties, weddings and office events with food trays, small chops and platters. Send the details on the Catering page and Sonny will reply with a quote.';
+    if (/cater|party|event|wedding|tray|birthday/.test(t)) return 'We cater parties, weddings and office events with food trays, small chops and platters. Send the details on the Catering page and Mamoke will reply with a quote.';
     if (/where|address|location|contact|phone|whatsapp/.test(t)) return `We are on ${B.ADDRESS}. WhatsApp or call ${B.PHONE}. Instagram & TikTok: @${B.INSTAGRAM}.`;
     if (/order|status|track/.test(t)) return 'You can track an order on the Track page with your order code (ESC-...) or your phone number.';
-    return `Hi! I am Ask Esca. Ask me about our peppered snail, food bowls, wraps, delivery areas, dates, or catering quotes.`;
+    return `Hi! I am your kitchen assistant. Ask me about our peppered snail, food bowls, wraps, delivery areas, dates, or catering quotes.`;
   }
 
   // ---------------------------------------------------------------- staff dashboard
@@ -1378,7 +1378,7 @@
       return supa().storage.from('menu-images').getPublicUrl(path).data.publicUrl;
     },
     async profiles() { return admin.list('profiles', 'created_at'); },
-    // portions Sonny set for one date: [{ menu_item_id, portions, avail_date }]
+    // portions set for one date: [{ menu_item_id, portions, avail_date }]
     async portions(date) {
       if (DEMO) return (demo().dish_date_portions || []).filter(r => !date || r.avail_date === date);
       let q = supa().from('dish_date_portions').select('menu_item_id, portions, avail_date');
