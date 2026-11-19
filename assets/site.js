@@ -143,17 +143,14 @@
     const header = document.createElement('div');
     header.innerHTML = `
       <div class="announcement-bar">
-        ${esc(B.ADDRESS ? B.ADDRESS.split(',')[0] : 'Online Kitchen')} · <b>Order by 8:00 PM for next-day delivery</b> · WhatsApp: ${esc(B.PHONE)}
+        Victoria Island, Lagos · <b>Order by 8:00 PM for next-day delivery</b> · WhatsApp: ${esc(B.PHONE)}
       </div>
       ${ESCA.DEMO ? '<div class="demo-banner">Demo mode: orders are saved in this browser and payment is simulated. Add your Supabase and n8n details in <b>config.js</b> to go live.</div>' : ''}
       <header class="site-header">
         <div class="wrap">
           <a class="brand" href="index.html">
-            <img src="assets/img/logo.svg" alt="${esc(B.NAME)}" width="38" height="38">
-            <span>
-              <b>${esc(B.NAME)}</b>
-              <small>${esc(B.ADDRESS ? B.ADDRESS.split(',')[0] : 'Online Kitchen')}</small>
-            </span>
+            <img src="assets/img/logo.svg" alt="${esc(B.NAME)}" width="26" height="26">
+            <b>${esc(B.NAME)}</b>
           </a>
           <div style="display:flex; align-items:center; gap:8px; margin-left:auto;">
             <a href="menu.html#cart" class="cart-btn" data-open-cart aria-label="View shopping cart" title="View order">
@@ -215,12 +212,13 @@
     f.innerHTML = `
       <div class="wrap cols">
         <div>
-          <div class="brand" style="color:inherit">
-            <img src="assets/img/logo.svg" alt="" width="38" height="38">
-            <span><b>${esc(B.NAME)}</b></span>
-          </div>
-          <p class="small" style="margin-top:12px; max-width:32em;">
-            ${esc(B.TAGLINE)}. Home cooked food bowls, peppered snail, rich soups and stews by the litre, chicken wraps, weekly meal plans and party trays, cooked fresh to order.
+          <a class="brand" href="index.html" style="color:inherit">
+            <img src="assets/img/logo.svg" alt="${esc(B.NAME)}" width="26" height="26">
+            <b>${esc(B.NAME)}</b>
+          </a>
+          <p class="small" style="margin-top:12px; max-width:28em;">
+            ${esc(B.TAGLINE || 'Food that looks good and tastes even better.')}<br>
+            Cooked fresh to order in Lagos.
           </p>
         </div>
         <div>
@@ -237,7 +235,7 @@
           <h3>Visit & Contact</h3>
           <p class="small">
             ${esc(B.ADDRESS)}<br>
-            WhatsApp or call: <span style="user-select:all; font-weight:700;">${esc(B.PHONE)}</span><br>
+            WhatsApp or call: <span style="user-select:all; font-weight:700; color:#fff;">${esc(B.PHONE)}</span><br>
             <a href="${ESCA.waLink('Hello ' + (B.NAME || 'Kitchen') + '!')}" target="_blank" rel="noopener">Open WhatsApp Chat →</a>
           </p>
         </div>
@@ -246,13 +244,12 @@
           <p class="small">
             <a href="https://www.tiktok.com/@${esc(B.TIKTOK)}" target="_blank" rel="noopener">TikTok @${esc(B.TIKTOK)}</a><br>
             <a href="https://www.instagram.com/${esc(B.INSTAGRAM)}" target="_blank" rel="noopener">Instagram @${esc(B.INSTAGRAM)}</a><br>
-            ${ESCA.C.TELEGRAM_BOT ? `<a href="https://t.me/${esc(ESCA.C.TELEGRAM_BOT)}" target="_blank" rel="noopener">Ask on Telegram</a><br>` : ''}
             <a href="admin/" style="opacity:0.75;">Staff Dashboard</a>
           </p>
         </div>
       </div>
-      <div class="wrap tiny" style="margin-top:28px; opacity:0.65; border-top:1px solid rgba(255,255,255,0.12); padding-top:16px;">
-        Prices in Nigerian naira (₦). Payments processed securely by card or bank transfer. Please tell us about allergies in the order notes.
+      <div class="wrap foot-bottom">
+        Prices in Nigerian naira (₦). Payments processed securely by card or bank transfer.
       </div>`;
     document.body.appendChild(f);
 
@@ -270,10 +267,11 @@
       if (bar) {
         if (b.announcement_active && b.announcement_banner) {
           bar.innerHTML = `Notice: ${esc(b.announcement_banner)} · WhatsApp: ${esc(b.phone || B.PHONE)}`;
-          bar.style.background = '#24140e';
-          bar.style.color = '#fff';
+          bar.style.background = '#073b25';
+          bar.style.color = '#f5c000';
         } else {
-          bar.innerHTML = `${esc(b.pickup_address || B.ADDRESS || 'Online Kitchen')} · <b>Order by 8:00 PM for next-day delivery</b> · WhatsApp: ${esc(b.phone || B.PHONE)}`;
+          const addr = (b.pickup_address && !b.pickup_address.includes('Umule') && !b.pickup_address.includes('Aba')) ? b.pickup_address : (B.ADDRESS || 'Victoria Island, Lagos');
+          bar.innerHTML = `${esc(addr.includes('Victoria Island') ? 'Victoria Island, Lagos' : addr.split(',')[0])} · <b>Order by 8:00 PM for next-day delivery</b> · WhatsApp: ${esc(b.phone || B.PHONE)}`;
         }
       }
 

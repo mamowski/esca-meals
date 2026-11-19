@@ -8,7 +8,7 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="../assets/img/logo.svg">
 <link rel="stylesheet" href="../assets/esca.css">
 <script src="../config.js"></script>
@@ -19,41 +19,41 @@
     color-scheme: light !important;
     --side-w: 248px;
     --side-w-collapsed: 64px;
-    --side-bg: #160e0a;
-    --side-surface: #22150f;
+    --side-bg: #073B25;
+    --side-surface: #052417;
     --side-line: rgba(255, 255, 255, 0.08);
-    --side-text: #e6ded8;
-    --side-muted: #9c8a80;
-    --side-gold: #e5b98a;
-    --side-gold-soft: rgba(229, 185, 138, 0.14);
-    --canvas-bg: #faf7f4;
-    --canvas-border: #ebdcd0;
-    --ink: #24180f !important;
-    --muted: #6e625a !important;
-    --bg: #faf7f4 !important;
+    --side-text: #eaf4ee;
+    --side-muted: #8fb49d;
+    --side-gold: #f5c000;
+    --side-gold-soft: rgba(245, 192, 0, 0.16);
+    --canvas-bg: #faf9f5;
+    --canvas-border: #e2eae5;
+    --ink: #14261c !important;
+    --muted: #55685e !important;
+    --bg: #faf9f5 !important;
     --surface: #ffffff !important;
-    --sunk: #f2ece4 !important;
-    --line: #ebdcd0 !important;
-    --line-subtle: #f0e6dc !important;
-    --cocoa-soft: #f4eee7 !important;
-    --btn-primary-bg: #24140e !important;
+    --sunk: #f0f6f2 !important;
+    --line: #e2eae5 !important;
+    --line-subtle: #edf3ef !important;
+    --cocoa-soft: #eaf4ee !important;
+    --btn-primary-bg: #0B5D3B !important;
     --btn-primary-text: #ffffff !important;
-    --btn-primary-border: #24140e !important;
+    --btn-primary-border: #0B5D3B !important;
     --btn-ghost-bg: transparent !important;
-    --btn-ghost-text: #6e625a !important;
-    --btn-ghost-border: #ebdcd0 !important;
+    --btn-ghost-text: #55685e !important;
+    --btn-ghost-border: #e2eae5 !important;
   }
 
   .btn-ghost {
     background: transparent !important;
-    color: #6e625a !important;
+    color: #55685e !important;
     border: 1px solid var(--canvas-border) !important;
   }
 
   .btn-ghost:hover:not(:disabled) {
-    background: #f4eee7 !important;
-    color: #24140e !important;
-    border-color: #d8c4b2 !important;
+    background: #eaf4ee !important;
+    color: #073B25 !important;
+    border-color: #b2d4c1 !important;
   }
 
   body {
@@ -61,32 +61,32 @@
     margin: 0;
     padding: 0;
     font-family: var(--sans);
-    color: #24180f !important;
+    color: #14261c !important;
     min-height: 100vh;
   }
 
   /* Form controls color lock */
   input:not([type="checkbox"]):not([type="radio"]), select, textarea {
     background: #ffffff !important;
-    color: #24180f !important;
+    color: #14261c !important;
     border: 1px solid var(--canvas-border) !important;
   }
 
   /* Chip pills in admin */
   .chip {
-    background: #f4eee7 !important;
-    color: #24180f !important;
+    background: #eaf4ee !important;
+    color: #14261c !important;
     border: 1px solid var(--canvas-border) !important;
   }
   .chip.on, .chip[aria-pressed="true"] {
-    background: #24140e !important;
+    background: #0B5D3B !important;
     color: #ffffff !important;
-    border-color: #24140e !important;
+    border-color: #0B5D3B !important;
   }
 
   /* Enforce clean modern sans-serif across 100% of the admin dashboard */
   *, *::before, *::after {
-    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   }
 
   /* Standard modern numbers: clean upright lining figures, tabular spacing, zero slash/serif */
@@ -104,7 +104,38 @@
     margin: 0 !important;
     padding: 0 !important;
     cursor: pointer;
-    accent-color: #24140e;
+    accent-color: #0B5D3B;
+  }
+
+  /* Unauthenticated State: Hide metrics, horizon bar, and sidebar until logged in */
+  body.not-authenticated #sidebar,
+  body.not-authenticated .horizon-bar,
+  body.not-authenticated #mobile-metrics,
+  body.not-authenticated #sidebar-backdrop {
+    display: none !important;
+  }
+  body.not-authenticated .admin-frame {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 100vh !important;
+    background: var(--canvas-bg) !important;
+  }
+  body.not-authenticated #main-stage {
+    width: 100% !important;
+    max-width: 480px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 24px 16px !important;
+    margin: auto !important;
+  }
+  body.not-authenticated .workspace-canvas {
+    width: 100% !important;
+    max-width: 480px !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
 
   /* Overall App Layout */
@@ -460,7 +491,7 @@
   }
 
   .topbar-layout-btn:hover {
-    background: #faf7f4;
+    background: #f0f6f2;
     border-color: var(--ink);
   }
 
@@ -478,7 +509,7 @@
     font-weight: 500;
   }
 
-  /* Grounded Operational Ticker Tile Cluster (Warm, purposeful, NOT stark) */
+  /* Grounded Operational Ticker Tile Cluster */
   .horizon-ticker {
     display: flex;
     align-items: center;
@@ -492,7 +523,7 @@
     align-items: flex-start;
     justify-content: center;
     gap: 2px;
-    background: #faf6f2;
+    background: #f4f8f5;
     border: 1px solid var(--canvas-border);
     border-radius: 8px;
     padding: 6px 14px;
@@ -501,13 +532,13 @@
   }
 
   .ticker-pill:hover {
-    background: #f4ece4;
+    background: #eaf4ee;
   }
 
   .ticker-title {
     font-size: 0.68rem;
     font-weight: 600;
-    color: #8c786d;
+    color: #55685e;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     line-height: 1;
@@ -516,7 +547,7 @@
   .ticker-num {
     font-size: 1.05rem;
     font-weight: 700;
-    color: #24140e;
+    color: #0B5D3B;
     line-height: 1.2;
     font-variant-numeric: tabular-nums lining-nums;
   }
@@ -555,7 +586,7 @@
     gap: 12px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
     position: relative;
-    border-top: 3px solid #24140e !important;
+    border-top: 3px solid #0B5D3B !important;
   }
 
   .docket-head {
@@ -740,8 +771,8 @@
   }
 
   .switch-toggle input:checked + .switch-track {
-    background: #24140e;
-    border-color: #24140e;
+    background: #0B5D3B;
+    border-color: #0B5D3B;
   }
 
   .switch-toggle input:checked + .switch-track::after {
@@ -752,7 +783,7 @@
   #dish-modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(22, 14, 10, 0.65);
+    background: rgba(7, 59, 37, 0.65);
     backdrop-filter: blur(4px);
     z-index: 100;
     display: flex;
@@ -872,7 +903,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #faf7f4;
+    background: #f0f6f2;
     border: 1px solid var(--canvas-border);
     border-radius: 999px;
     padding: 6px 14px;
@@ -884,9 +915,9 @@
   }
 
   .day-toggle-pill.active {
-    background: #24140e;
+    background: #0B5D3B;
     color: #fff;
-    border-color: #24140e;
+    border-color: #0B5D3B;
   }
 
   .options-builder-list {
@@ -899,7 +930,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #faf7f4;
+    background: #f0f6f2;
     padding: 8px 10px;
     border-radius: 8px;
     border: 1px solid var(--canvas-border);
@@ -936,7 +967,7 @@
     align-items: center;
     justify-content: flex-end;
     gap: 10px;
-    background: #faf7f4;
+    background: #faf9f5;
   }
 
   /* Pantry & Raw Food Market List Styles */
@@ -983,7 +1014,7 @@
     min-height: 20px !important;
     max-width: 20px !important;
     cursor: pointer;
-    accent-color: #24140e;
+    accent-color: #0B5D3B;
     flex-shrink: 0;
   }
 
@@ -1410,7 +1441,7 @@
   }
 </style>
 </head>
-<body>
+<body class="not-authenticated">
 
 <div class="admin-frame">
   <!-- Backdrop for Mobile Drawer -->
@@ -1420,7 +1451,7 @@
   <aside id="sidebar" aria-label="Kitchen Navigation">
     <div class="side-header">
       <div class="side-brand-icon">
-        <img src="../assets/img/logo.svg" alt="Esca Logo" width="20" height="20">
+        <img src="../assets/img/logo.svg" alt="Mamoke's Kitchen Logo" width="20" height="20">
       </div>
       <div class="side-brand-text">
         <span class="side-brand-title">Mamoke's Kitchen</span>
@@ -1483,19 +1514,19 @@
       <div class="horizon-ticker" id="horizon-stream">
         <div class="ticker-pill">
           <span class="ticker-title">Orders today</span>
-          <b class="ticker-num" id="stat-orders-today">0</b>
+          <b class="ticker-num" id="stat-orders-today">--</b>
         </div>
         <div class="ticker-pill">
           <span class="ticker-title">Revenue today</span>
-          <b class="ticker-num" id="stat-revenue-today">₦0</b>
+          <b class="ticker-num" id="stat-revenue-today">--</b>
         </div>
         <div class="ticker-pill">
           <span class="ticker-title">Deliveries</span>
-          <b class="ticker-num" id="stat-deliveries-today">0</b>
+          <b class="ticker-num" id="stat-deliveries-today">--</b>
         </div>
         <div class="ticker-pill">
           <span class="ticker-title">Pickups</span>
-          <b class="ticker-num" id="stat-pickups-today">0</b>
+          <b class="ticker-num" id="stat-pickups-today">--</b>
         </div>
       </div>
     </header>
@@ -1504,19 +1535,19 @@
     <div class="mobile-metric-strip" id="mobile-metrics">
       <div class="mobile-metric-card">
         <span class="title">Orders today</span>
-        <b class="value" id="m-stat-orders">0</b>
+        <b class="value" id="m-stat-orders">--</b>
       </div>
       <div class="mobile-metric-card">
         <span class="title">Revenue today</span>
-        <b class="value" id="m-stat-revenue">₦0</b>
+        <b class="value" id="m-stat-revenue">--</b>
       </div>
       <div class="mobile-metric-card">
         <span class="title">Deliveries</span>
-        <b class="value" id="m-stat-deliveries">0</b>
+        <b class="value" id="m-stat-deliveries">--</b>
       </div>
       <div class="mobile-metric-card">
         <span class="title">Pickups</span>
-        <b class="value" id="m-stat-pickups">0</b>
+        <b class="value" id="m-stat-pickups">--</b>
       </div>
     </div>
 

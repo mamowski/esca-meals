@@ -82,16 +82,8 @@
 
     if (!CUR) return loginView();
 
-    $('#side-user-name').textContent = P?.full_name || CUR.user.email;
-    $('#side-user-role').textContent = P?.role === 'admin' ? 'Kitchen Lead' : 'Staff Member';
-    $('#side-user-avatar').textContent = (P?.full_name || CUR.user.email || 'S').charAt(0).toUpperCase();
-
-    $('#side-signout-btn').onclick = async () => {
-      await A.signOut();
-      location.reload();
-    };
-
     if (!P || !['staff', 'admin'].includes(P.role)) {
+      document.body.classList.add('not-authenticated');
       app.innerHTML = `
         <div class="panel stack" style="max-width:540px; margin:40px auto;">
           <h2>Staff Account Pending Approval</h2>
@@ -101,6 +93,17 @@
       $('#btn-recheck').onclick = () => location.reload();
       return;
     }
+
+    document.body.classList.remove('not-authenticated');
+    $('#side-user-name').textContent = P?.full_name || CUR.user.email;
+    $('#side-user-role').textContent = P?.role === 'admin' ? 'Kitchen Lead' : 'Staff Member';
+    $('#side-user-avatar').textContent = (P?.full_name || CUR.user.email || 'S').charAt(0).toUpperCase();
+
+    $('#side-signout-btn').onclick = async () => {
+      document.body.classList.add('not-authenticated');
+      await A.signOut();
+      location.reload();
+    };
 
     buildNav();
     updateHorizonDate();
@@ -118,18 +121,29 @@
   }
 
   function loginView() {
+    document.body.classList.add('not-authenticated');
+    ['stat-orders-today', 'm-stat-orders', 'stat-revenue-today', 'm-stat-revenue', 'stat-deliveries-today', 'm-stat-deliveries', 'stat-pickups-today', 'm-stat-pickups'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = '--';
+    });
     app.innerHTML = `
-      <div class="login stack" style="max-width:440px; margin:40px auto; padding:24px; background:#fff; border-radius:16px; border:1px solid var(--canvas-border);">
-        <h1 style="font-size:1.6rem; font-weight:700; margin:0;">Kitchen Pass</h1>
-        <p class="muted small" style="margin:4px 0 16px;">Sign in to access orders, menu studio, and batch portion limits.</p>
+      <div class="login stack" style="max-width:440px; margin:0 auto; padding:32px 28px; background:#fff; border-radius:16px; border:1px solid var(--canvas-border); box-shadow:0 4px 20px rgba(7,59,37,0.06);">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+          <img src="../assets/img/logo.svg" alt="Mamoke's Kitchen Logo" width="36" height="36" style="border-radius:8px;">
+          <div>
+            <h1 style="font-size:1.4rem; font-weight:700; margin:0; color:var(--ink);">Kitchen Pass</h1>
+            <div style="font-size:0.75rem; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">Mamoke's Kitchen</div>
+          </div>
+        </div>
+        <p class="muted small" style="margin:0 0 20px;">Sign in to access orders, menu studio, and batch portion limits.</p>
         ${ESCA.DEMO ? '<div class="notice warn small" style="margin-bottom:14px;">Demo credentials: <b style="user-select:all;">owner@escameals.demo</b> / <b style="user-select:all;">EscaDemo123</b></div>' : ''}
         <form class="stack" id="login">
           <div class="field"><label for="l-email">Email</label><input id="l-email" type="email" autocomplete="username" value="${ESCA.DEMO ? 'owner@escameals.demo' : ''}"></div>
           <div class="field"><label for="l-pass">Password</label><input id="l-pass" type="password" autocomplete="current-password" value="${ESCA.DEMO ? 'EscaDemo123' : ''}"></div>
           <div id="l-msg"></div>
-          <button class="btn btn-primary" type="submit" style="margin-top:6px;">Sign in to Kitchen</button>
+          <button class="btn btn-primary" type="submit" style="margin-top:6px; font-weight:600;">Sign in to Kitchen</button>
         </form>
-        <details style="margin-top:14px;"><summary class="small muted" style="cursor:pointer;">New kitchen staff? Register</summary>
+        <details style="margin-top:16px;"><summary class="small muted" style="cursor:pointer;">New kitchen staff? Register</summary>
           <form class="stack" id="reg" style="margin-top:12px">
             <div class="field"><label for="r-name">Full name</label><input id="r-name" autocomplete="name"></div>
             <div class="field"><label for="r-email">Email</label><input id="r-email" type="email"></div>
@@ -376,7 +390,7 @@
     const lowStockDishes = [];
     menu.filter(m => m.is_active).forEach(m => {
       const r = portionsTarget.find(p => p.menu_item_id === m.id) ||
-                (allPortions || []).find(p => p.menu_item_id === m.id);
+        (allPortions || []).find(p => p.menu_item_id === m.id);
       if (r && r.portions != null) {
         const b = bookedTarget[m.id] || 0;
         const left = Math.max(r.portions - b, 0);
@@ -690,8 +704,8 @@
     const payBadge = o.payment_status === 'paid'
       ? `<span class="badge ok">Paid ${money(o.amount_paid)}</span>`
       : o.payment_status === 'underpaid'
-      ? `<span class="badge bad">Underpaid ${money(o.amount_paid)}</span>`
-      : `<span class="badge warn">${esc(o.payment_status)}</span>`;
+        ? `<span class="badge bad">Underpaid ${money(o.amount_paid)}</span>`
+        : `<span class="badge warn">${esc(o.payment_status)}</span>`;
 
     const fulInfo = o.fulfilment === 'delivery'
       ? `Delivery (${esc(o.delivery_zone || '')}): ${esc(o.address || '')}${o.landmark ? ` (${esc(o.landmark)})` : ''}`
@@ -724,7 +738,7 @@
           `).join('')}
         </div>
 
-        ${o.notes ? `<div class="small" style="background:#faf6f2; border:1px solid var(--canvas-border); border-left:3px solid #24140e; padding:7px 10px; border-radius:6px; color:var(--ink); line-height:1.4;"><b>Kitchen Note:</b> ${esc(o.notes)}</div>` : ''}
+        ${o.notes ? `<div class="small" style="background:#f4f8f5; border:1px solid var(--canvas-border); border-left:3px solid #0B5D3B; padding:7px 10px; border-radius:6px; color:var(--ink); line-height:1.4;"><b>Kitchen Note:</b> ${esc(o.notes)}</div>` : ''}
 
         <div class="docket-footer">
           <span class="badge">${NICE_STATUS[o.status] || o.status}</span>
@@ -1421,16 +1435,16 @@
           </thead>
           <tbody>
             ${rows.map(m => {
-              const n = getSetNumber(m.id);
-              const b = booked[m.id] || 0;
-              const left = n == null ? null : Math.max(n - b, 0);
-              const statusBadge = left == null
-                ? '<span class="muted small">No limit</span>'
-                : left === 0
-                ? '<span class="badge bad">Sold out</span>'
-                : `<span class="badge ${left <= 3 ? 'warn' : 'ok'}">${left} left</span>`;
+      const n = getSetNumber(m.id);
+      const b = booked[m.id] || 0;
+      const left = n == null ? null : Math.max(n - b, 0);
+      const statusBadge = left == null
+        ? '<span class="muted small">No limit</span>'
+        : left === 0
+          ? '<span class="badge bad">Sold out</span>'
+          : `<span class="badge ${left <= 3 ? 'warn' : 'ok'}">${left} left</span>`;
 
-              return `
+      return `
                 <tr>
                   <td>
                     <b>${esc(m.name)}</b>
@@ -1444,7 +1458,7 @@
                   </td>
                 </tr>
               `;
-            }).join('')}
+    }).join('')}
           </tbody>
         </table>
       </div>
@@ -1492,10 +1506,10 @@
 
       <div style="display:flex; flex-direction:column; gap:14px;">
         ${rows.map(r => {
-          const clientName = (r.name || 'Client').replace(/^Example:\s*/i, '');
-          const summaryText = r.summary || r.ai_summary || '';
+      const clientName = (r.name || 'Client').replace(/^Example:\s*/i, '');
+      const summaryText = r.summary || r.ai_summary || '';
 
-          return `
+      return `
             <div class="catering-card">
               <div class="catering-card-head">
                 <div>
@@ -1538,7 +1552,7 @@
               </div>
             </div>
           `;
-        }).join('') || `
+    }).join('') || `
           <div style="background:#fff; border:1px solid var(--canvas-border); border-radius:12px; padding:40px; text-align:center;">
             <p class="muted" style="margin:0;">No catering enquiries received yet.</p>
           </div>
@@ -2176,12 +2190,12 @@
         <select class="no-dish-select" required>
           <option value="" disabled ${!selItemId ? 'selected' : ''}>-- Select a dish --</option>
           ${dishes.map(m => {
-            const id = m.menu_item_id || m.id;
-            const isSoldOut = m.portions_left === 0;
-            const leftLabel = m.portions_left != null ? (isSoldOut ? ' (Sold out)' : ` (${m.portions_left} left)`) : '';
-            const isSel = selItemId && String(id) === String(selItemId);
-            return `<option value="${id}" ${isSoldOut ? 'disabled style="color:#999;"' : ''} ${isSel ? 'selected' : ''}>${esc(m.name)}${leftLabel}</option>`;
-          }).join('')}
+      const id = m.menu_item_id || m.id;
+      const isSoldOut = m.portions_left === 0;
+      const leftLabel = m.portions_left != null ? (isSoldOut ? ' (Sold out)' : ` (${m.portions_left} left)`) : '';
+      const isSel = selItemId && String(id) === String(selItemId);
+      return `<option value="${id}" ${isSoldOut ? 'disabled style="color:#999;"' : ''} ${isSel ? 'selected' : ''}>${esc(m.name)}${leftLabel}</option>`;
+    }).join('')}
         </select>
       </div>
       <div style="flex:1.5; min-width:140px;" class="no-opt-wrap">
@@ -2208,10 +2222,10 @@
         optSel.innerHTML = `
           <option value="" disabled ${!targetOptId ? 'selected' : ''}>-- Select size --</option>
           ${chosenDish.options.map(o => {
-            const optId = o.option_id || o.id;
-            const isOptSel = targetOptId && String(optId) === String(targetOptId);
-            return `<option value="${optId}" data-price="${o.price}" ${isOptSel ? 'selected' : ''}>${esc(o.option_name)} (${money(o.price)})</option>`;
-          }).join('')}
+          const optId = o.option_id || o.id;
+          const isOptSel = targetOptId && String(optId) === String(targetOptId);
+          return `<option value="${optId}" data-price="${o.price}" ${isOptSel ? 'selected' : ''}>${esc(o.option_name)} (${money(o.price)})</option>`;
+        }).join('')}
         `;
         if (chosenDish.options.length === 1) {
           optSel.value = chosenDish.options[0].option_id || chosenDish.options[0].id;
